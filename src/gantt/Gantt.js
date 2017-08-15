@@ -21,24 +21,48 @@ class Gantt extends Component {
     super(props);
 
     // Constant used to build chart elements
-    this.constants = {
-      // Base dimensions
-      BASE_HEIGHT: 12,                // task arrow height
-      BASE_WIDTH: 15,                 // x-coord difference between 2 days 
+    this.constants = {};
+    // Base dimensions
+    this.constants.BASE_HEIGHT = 12;                // task arrow height
+    this.constants.BASE_WIDTH = 15;                 // x-coord difference between 2 days 
 
-      // Base x-coordinates
-      DATE_GRADUATION_START: 200,     // where date graduation starts
-      TASK_START: 50,                // where task title text starts
-      SUBTASK_START: 200,             // where sub-task title text starts
+    // Arrow dimensions
+    this.constants.TASK_ARROW_HEIGHT = 1.5 * this.constants.BASE_HEIGHT;
+    this.constants.SUBTASK_ARROW_HEIGHT = 1 * this.constants.BASE_HEIGHT;
+    this.constants.TASK_TITLE_START = 20;
+    this.constants.SUBTASK_TITLE_START = 40;
+    this.constants.DATE_GRADUATION_START = 200;     // where date graduation starts
 
-      // Date constants
-      START_DATE: new Date('01/01/17'),
 
-      // Fonts
-      FONT_SIZE: 8,
-      FONT_FAMILY: 'Courier New',
-      FONT_STROKE_WIDTH: 0.4,
-    };
+    // Spaces beween tasks
+    this.constants.TASK_INTERLINE = 1 * this.constants.BASE_HEIGHT;
+    this.constants.SUBTASK_INTERLINE = 0.5 * this.constants.BASE_HEIGHT;
+
+    // Fonts
+    this.constants.TASK_FONT_SIZE = 9;
+    this.constants.SUBTASK_FONT_SIZE = 7;
+
+    this.constants.FONT_FAMILY = 'Courier New';
+    this.constants.FONT_STROKE_WIDTH = 0.4,
+
+    // Task title coords
+    this.constants.TASK_TITLE_START_OFFSET = {
+      x: this.constants.TASK_ARROW_HEIGHT / 2 + 4,
+      y: this.constants.TASK_FONT_SIZE / 2.5,
+    }
+
+    this.constants.SUBTASK_TITLE_START_OFFSET = {
+      x: this.constants.SUBTASK_ARROW_HEIGHT / 2 + 3,
+      y: this.constants.SUBTASK_FONT_SIZE / 2.5,
+    }
+
+    // Line type
+    this.constants.TASK = 0;
+    this.constants.SUBTASK = 1;
+    
+
+    // Date constants
+    this.constants.START_DATE = new Date('01/01/17');
 
     this.dateToXCoord = this.dateToXCoord.bind(this);
     this.drawArrow = this.drawArrow.bind(this);
@@ -64,6 +88,7 @@ class Gantt extends Component {
 
 
     this.drawTaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), 50);
+    this.drawSubtaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), 150);
 
 		// Draw the view now:
 		paper.view.draw();
@@ -80,22 +105,29 @@ class Gantt extends Component {
     return xcoord;
   }
 
-  drawArrow(xStart, xEnd, yCoord) {
+  drawArrow(xStart, xEnd, yCoord, taskType) {
+    let ARROW_HEIGHT = 0;
+    
+    if(taskType === this.constants.TASK)
+      ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
+    else
+      ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
+
     const drawArc = (startDate, yCoord) => {
       var arc = new paper.Path.Arc({
-        from: [xStart, yCoord - this.constants.BASE_HEIGHT / 2],
-        through: [xStart - this.constants.BASE_HEIGHT / 2, yCoord],
-        to: [xStart, yCoord + this.constants.BASE_HEIGHT / 2],
+        from: [xStart, yCoord - ARROW_HEIGHT / 2],
+        through: [xStart - ARROW_HEIGHT / 2, yCoord],
+        to: [xStart, yCoord + ARROW_HEIGHT / 2],
         strokeColor: 'black'
       });
     }
 
     const drawLines = (xStart, xEnd, yCoord) => {
-      const lineUpStart = new paper.Point(xStart, yCoord - this.constants.BASE_HEIGHT / 2);
-      const lineUpEnd = new paper.Point(xEnd, yCoord - this.constants.BASE_HEIGHT / 2);
+      const lineUpStart = new paper.Point(xStart, yCoord - ARROW_HEIGHT / 2);
+      const lineUpEnd = new paper.Point(xEnd, yCoord - ARROW_HEIGHT / 2);
 
-      const lineDownStart = new paper.Point(xStart, yCoord + this.constants.BASE_HEIGHT / 2);
-      const lineDownEnd = new paper.Point(xEnd, yCoord + this.constants.BASE_HEIGHT / 2);
+      const lineDownStart = new paper.Point(xStart, yCoord + ARROW_HEIGHT / 2);
+      const lineDownEnd = new paper.Point(xEnd, yCoord + ARROW_HEIGHT / 2);
 
       const lineUp = new paper.Path.Line(lineUpStart, lineUpEnd);
       const lineDown = new paper.Path.Line(lineDownStart, lineDownEnd);
@@ -109,7 +141,7 @@ class Gantt extends Component {
 
       const curveUp = new paper.Path(
         new paper.Segment(
-          new paper.Point(xEnd, yCoord - this.constants.BASE_HEIGHT / 2),
+          new paper.Point(xEnd, yCoord - ARROW_HEIGHT / 2),
           null,
           new paper.Point(10, 0),
         ),
@@ -121,7 +153,7 @@ class Gantt extends Component {
       );
       const curveDown = new paper.Path(
         new paper.Segment(
-          new paper.Point(xEnd, yCoord + this.constants.BASE_HEIGHT / 2),
+          new paper.Point(xEnd, yCoord + ARROW_HEIGHT / 2),
           null,
           new paper.Point(10, 0),
         ),
@@ -149,22 +181,43 @@ class Gantt extends Component {
    * @param {object} endDate Arrow end date
    * @param {number} yCoord Y-coordinate of arrow midline
    */
-  drawTaskArrow(startDate, endDate, yCoord) {
-    this.drawArrow(this.dateToXCoord(startDate), this.dateToXCoord(endDate), yCoord);
+  drawTaskArrow(startDate, endDate, yCoord, taskType) {
+    this.drawArrow(this.dateToXCoord(startDate), this.dateToXCoord(endDate), yCoord, taskType);
   }
 
-  drawTaskTitle(title, yCoord) {
-    const arrowEndPoint = this.drawArrow(this.constants.TASK_START, 100, yCoord);
+  drawTaskTitle(title, yCoord, taskType = this.constants.TASK) {
+    let ARROW_HEIGHT, ARROW_START, TEXT_START;
 
-    const circle = paper.Path.Circle(new paper.Point(this.constants.TASK_START, yCoord), this.constants.BASE_HEIGHT / 2);
+    if(taskType === this.constants.TASK) {
+      ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
+      ARROW_START = this.constants.TASK_TITLE_START;
+      TEXT_START = this.constants.TASK_TITLE_START_OFFSET;
+    } else {
+      ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
+      ARROW_START = this.constants.SUBTASK_TITLE_START;
+      TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
+    }
+
+    const arrowEndPoint = this.drawArrow(ARROW_START, 100, yCoord, taskType);
+    const circle = paper.Path.Circle(new paper.Point(ARROW_START, yCoord), ARROW_HEIGHT / 2);
     circle.fillColor = 'black';
+    const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
 
-    const text = new paper.PointText(new paper.Point(this.constants.TASK_START + 3 * this.constants.BASE_HEIGHT / 4, yCoord + this.constants.BASE_HEIGHT / 4));
-    text.strokeColor = 'black';
-    text.content = title;
-    text.fontSize = this.constants.FONT_SIZE;
-    text.fontFamily = this.constants.FONT_FAMILY;
-    text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+
+    if(taskType === this.constants.TASK) {
+      text.strokeColor = 'black';
+      text.content = title;
+      text.fontSize = this.constants.TASK_FONT_SIZE;
+      text.fontFamily = this.constants.FONT_FAMILY;
+      text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+    } else {
+      text.strokeColor = 'black';
+      text.content = title;
+      text.fontSize = this.constants.SUBTASK_FONT_SIZE;
+      text.fontFamily = this.constants.FONT_FAMILY;
+      text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+    }
+
 
     return arrowEndPoint;
   }
@@ -176,10 +229,14 @@ class Gantt extends Component {
   }
 
   drawTaskLine(taskName, startDate, endDate, yCoord) {
-    this.drawTaskArrow(startDate, endDate, yCoord);
-    
-    const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord);
+    this.drawTaskArrow(startDate, endDate, yCoord, this.constants.TASK);
+    const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK);
+    this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate) - this.constants.BASE_WIDTH / 2, yCoord);
+  }
 
+  drawSubtaskLine(subtaskName, startDate, endDate, yCoord) {
+    this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK);
+    const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK);
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate) - this.constants.BASE_WIDTH / 2, yCoord);
   }
 

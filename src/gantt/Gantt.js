@@ -205,7 +205,7 @@ class Gantt extends Component {
     return xcoord;
   }
 
-  drawArrow(xStart, xEnd, yCoord, taskType, color) {
+  drawArrow(xStart, xEnd, yCoord, taskType, color, isFilled = true) {
     const strokeWidth = 1;
 
     let ARROW_HEIGHT = 0;
@@ -286,8 +286,10 @@ class Gantt extends Component {
     );
 
     arrow.strokeColor = color;
-    arrow.fillColor = color;
     arrow.opacity = opacity;
+
+    if(isFilled)
+      arrow.fillColor = color;
 
 
     return endPoint;
@@ -316,9 +318,9 @@ class Gantt extends Component {
       TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
     }
 
-    const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType, color);
+    const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType, color, false);
     const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
-    circle.fillColor = 'black'; 
+    circle.fillColor = color; 
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
 
 
@@ -336,6 +338,8 @@ class Gantt extends Component {
       text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
     }
 
+    text.fillColor = color;
+
 
     return arrowEndPoint;
   }
@@ -344,6 +348,7 @@ class Gantt extends Component {
     const line = paper.Path.Line(new paper.Point(xStart, yCoord), new paper.Point(xEnd, yCoord));
     line.strokeColor = 'black';
     line.dashArray = [2, 3];
+    line.opacity = 0.5;
   }
 
   drawTaskArrowPoints(startDate, endDate, yCoord) {
@@ -357,12 +362,16 @@ class Gantt extends Component {
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(startDate, 1).getDate();
+        text.fillColor = 'white';
+        text.opacity = 0.5;
       } else if(i === numPoints + 1) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
         text.strokeColor = this.constants.TEXT_COLOR; 
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(endDate, -1).getDate();
+        text.fillColor = 'white';
+        text.opacity = 0.5;
       } else {
         points[i] = new paper.Path.Circle(
           new paper.Point(this.dateToXCoord(startDate) + i * 7 * this.constants.BASE_WIDTH + this.constants.TASK_ARROW_HEIGHT / 2, yCoord),
@@ -371,6 +380,7 @@ class Gantt extends Component {
 
         points[i].fillColor = this.constants.TEXT_COLOR_OPACITY;
       }
+
 
     }
   }

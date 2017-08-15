@@ -66,6 +66,8 @@ class Gantt extends Component {
 
     // Other constants
     this.constants.FIRST_TASK_Y = 50;
+    this.constants.TEXT_COLOR_OPACITY = new paper.Color(255, 255, 255, 0.5);
+    this.constants.TEXT_COLOR = 'white';
 
     this.dateToXCoord = this.dateToXCoord.bind(this);
     this.drawAllTasks = this.drawAllTasks.bind(this);
@@ -167,14 +169,14 @@ class Gantt extends Component {
 
     for(let i = 0; i < tasks.length; i++) {
       const task = tasks[i]
-      this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord);
+      this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, 'red');
 
       if(task.subtasks.length) {
         yCoord += this.constants.TASK_ARROW_HEIGHT / 2 + this.constants.TASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT / 2;
 
         for(let j = 0; j < task.subtasks.length; j++) {
           const subtask = task.subtasks[j];
-          this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord);
+          this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, 'red');
 
           if(j !== task.subtasks.length - 1)
             yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT;
@@ -199,7 +201,7 @@ class Gantt extends Component {
     return xcoord;
   }
 
-  drawArrow(xStart, xEnd, yCoord, taskType) {
+  drawArrow(xStart, xEnd, yCoord, taskType, color) {
     let ARROW_HEIGHT = 0;
     
     if(taskType === this.constants.TASK)
@@ -212,7 +214,7 @@ class Gantt extends Component {
         from: [xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2],
         through: [xStart, yCoord],
         to: [xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2],
-        strokeColor: 'black'
+        strokeColor: color,
       });
     }
 
@@ -226,8 +228,8 @@ class Gantt extends Component {
       const lineUp = new paper.Path.Line(lineUpStart, lineUpEnd);
       const lineDown = new paper.Path.Line(lineDownStart, lineDownEnd);
 
-      lineUp.strokeColor = 'black';
-      lineDown.strokeColor = 'black';
+      lineUp.strokeColor = color;
+      lineDown.strokeColor = color;
     }
 
     const drawArrowTip = (xEnd, yCoord, taskType) => {
@@ -265,8 +267,8 @@ class Gantt extends Component {
         )
       );
 
-      curveUp.strokeColor = 'black';
-      curveDown.strokeColor = 'black';
+      curveUp.strokeColor = color;
+      curveDown.strokeColor = color;
 
       return endPoint;
     }
@@ -282,11 +284,11 @@ class Gantt extends Component {
    * @param {object} endDate Arrow end date
    * @param {number} yCoord Y-coordinate of arrow midline
    */
-  drawTaskArrow(startDate, endDate, yCoord, taskType) {
-    this.drawArrow(this.dateToXCoord(startDate), this.dateToXCoord(endDate), yCoord, taskType);
+  drawTaskArrow(startDate, endDate, yCoord, taskType, color) {
+    this.drawArrow(this.dateToXCoord(startDate), this.dateToXCoord(endDate), yCoord, taskType, color);
   }
 
-  drawTaskTitle(title, yCoord, taskType = this.constants.TASK) {
+  drawTaskTitle(title, yCoord, taskType = this.constants.TASK, color) {
     let ARROW_HEIGHT, ARROW_START, TEXT_START;
 
     if(taskType === this.constants.TASK) {
@@ -299,20 +301,20 @@ class Gantt extends Component {
       TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
     }
 
-    const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType);
+    const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType, color);
     const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
-    circle.fillColor = 'black';
+    circle.fillColor = 'black'; 
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
 
 
     if(taskType === this.constants.TASK) {
-      text.strokeColor = 'black';
+      text.strokeColor = color;
       text.content = title;
       text.fontSize = this.constants.TASK_FONT_SIZE;
       text.fontFamily = this.constants.FONT_FAMILY;
       text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
     } else {
-      text.strokeColor = 'black';
+      text.strokeColor = color;
       text.content = title;
       text.fontSize = this.constants.SUBTASK_FONT_SIZE;
       text.fontFamily = this.constants.FONT_FAMILY;
@@ -336,13 +338,13 @@ class Gantt extends Component {
     for(let i = 0; i <= numPoints + 1; i++) {
       if(i === 0) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
-        text.strokeColor = 'black';
+        text.strokeColor = this.constants.TEXT_COLOR; 
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = startDate.getDate();
       } else if(i === numPoints + 1) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
-        text.strokeColor = 'black';
+        text.strokeColor = this.constants.TEXT_COLOR; 
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(endDate, -1).getDate();
@@ -352,22 +354,22 @@ class Gantt extends Component {
           this.constants.TASK_ARROW_POINT_DIAMETER / 2,
         );
 
-        points[i].fillColor = 'black';
+        points[i].fillColor = this.constants.TEXT_COLOR_OPACITY;
       }
 
     }
   }
 
-  drawTaskLine(taskName, startDate, endDate, yCoord) {
-    this.drawTaskArrow(addDays(startDate, -1), addDays(endDate, +1), yCoord, this.constants.TASK);
-    const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK);
+  drawTaskLine(taskName, startDate, endDate, yCoord, color) {
+    this.drawTaskArrow(addDays(startDate, -1), addDays(endDate, +1), yCoord, this.constants.TASK, color);
+    const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK, color);
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);
     this.drawTaskArrowPoints(startDate, endDate, yCoord);
   }
 
-  drawSubtaskLine(subtaskName, startDate, endDate, yCoord) {
-    this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK);
-    const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK);
+  drawSubtaskLine(subtaskName, startDate, endDate, yCoord, color) {
+    this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK, color);
+    const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK, color);
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);
   }
 

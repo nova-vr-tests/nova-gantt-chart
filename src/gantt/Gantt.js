@@ -11,7 +11,6 @@ const addDays = (dat, jump) => {
 
 const diffInDays = (startDate, endDate) => {
   const diff = endDate - startDate;    // milliseconds
-  console.log(startDate, endDate, diff / 1000 / 60 / 60 / 24)
 
   return diff / (1000*60*60*24);
 }
@@ -32,6 +31,7 @@ class Gantt extends Component {
     this.constants.TASK_TITLE_START = 20;
     this.constants.SUBTASK_TITLE_START = 40;
     this.constants.DATE_GRADUATION_START = 200;     // where date graduation starts
+    this.constants.TASK_ARROW_POINT_DIAMETER = 5;
 
 
     // Spaces beween tasks
@@ -72,6 +72,7 @@ class Gantt extends Component {
     this.drawArrow = this.drawArrow.bind(this);
     this.drawDashedLine = this.drawDashedLine.bind(this);
     this.drawTaskArrow = this.drawTaskArrow.bind(this);
+    this.drawTaskArrowPoints = this.drawTaskArrowPoints.bind(this);
     this.drawTaskLine = this.drawTaskLine.bind(this);
     this.drawTaskTitle = this.drawTaskTitle.bind(this);
     this.setupCanvas = this.setupCanvas.bind(this);
@@ -328,10 +329,40 @@ class Gantt extends Component {
     line.dashArray = [2, 3];
   }
 
+  drawTaskArrowPoints(startDate, endDate, yCoord) {
+    const points = [];
+    const numPoints = Math.floor(diffInDays(startDate, endDate) / 8);
+
+    for(let i = 0; i <= numPoints + 1; i++) {
+      if(i === 0) {
+        const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
+        text.strokeColor = 'black';
+        text.fontFamily = this.constants.FONT_FAMILY;
+        text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+        text.content = startDate.getDate();
+      } else if(i === numPoints + 1) {
+        const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
+        text.strokeColor = 'black';
+        text.fontFamily = this.constants.FONT_FAMILY;
+        text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+        text.content = addDays(endDate, -1).getDate();
+      } else {
+        points[i] = new paper.Path.Circle(
+          new paper.Point(this.dateToXCoord(startDate) + i * 7 * this.constants.BASE_WIDTH + this.constants.TASK_ARROW_HEIGHT / 2, yCoord),
+          this.constants.TASK_ARROW_POINT_DIAMETER / 2,
+        );
+
+        points[i].fillColor = 'black';
+      }
+
+    }
+  }
+
   drawTaskLine(taskName, startDate, endDate, yCoord) {
     this.drawTaskArrow(addDays(startDate, -1), addDays(endDate, +1), yCoord, this.constants.TASK);
     const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK);
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);
+    this.drawTaskArrowPoints(startDate, endDate, yCoord);
   }
 
   drawSubtaskLine(subtaskName, startDate, endDate, yCoord) {

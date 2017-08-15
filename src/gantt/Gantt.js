@@ -12,6 +12,7 @@ const addDays = days => {
 
 const diffInDays = (startDate, endDate) => {
   const diff = endDate - startDate;    // milliseconds
+  console.log(startDate, endDate, diff / 1000 / 60 / 60 / 24)
 
   return diff / (1000*60*60*24);
 }
@@ -64,7 +65,11 @@ class Gantt extends Component {
     // Date constants
     this.constants.START_DATE = new Date('01/01/17');
 
+    // Other constants
+    this.constants.FIRST_TASK_Y = 50;
+
     this.dateToXCoord = this.dateToXCoord.bind(this);
+    this.drawAllTasks = this.drawAllTasks.bind(this);
     this.drawArrow = this.drawArrow.bind(this);
     this.drawDashedLine = this.drawDashedLine.bind(this);
     this.drawTaskArrow = this.drawTaskArrow.bind(this);
@@ -87,11 +92,69 @@ class Gantt extends Component {
     paper.setup(canvas);
 
 
-    this.drawTaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), 50);
-    this.drawSubtaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), 150);
+    // this.drawTaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), this.constants.FIRST_TASK_Y);
+    // this.drawSubtaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), this.constants.FIRST_TASK_Y + this.constants.TASK_ARROW_HEIGHT);
+    // this.drawSubtaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), this.constants.FIRST_TASK_Y + this.constants.SUBTASK_ARROW_HEIGHT);
+
+    this.drawAllTasks();
 
 		// Draw the view now:
 		paper.view.draw();
+  }
+
+  drawAllTasks() {
+    const tasks = [
+      {
+        title: "Task 1",
+        startDate: new Date('01/01/17'),
+        endDate: new Date('01/18/17'),
+        subtasks: [
+          {
+            title: "Subtask 1.1",
+            startDate: this.constants.START_DATE,
+            endDate: new Date('01/09/17'),
+          },
+          {
+            title: "Subtask 1.2",
+            startDate: new Date('01/09/17'),
+            endDate: new Date('01/18/17'),
+          }
+        ]
+      },
+      {
+        title: "Task 2",
+        startDate: new Date('01/18/17'),
+        endDate: new Date('01/31/17'),
+        subtasks: [
+          {
+            title: "Subtask 2.1",
+            startDate: new Date('01/18/17'),
+            endDate: new Date('01/25/17'),
+          },
+          {
+            title: "Subtask 2.2",
+            startDate: new Date('01/25/17'),
+            endDate: new Date('01/31/17'),
+          }
+        ]
+      },
+    ];
+
+    let yCoord = this.constants.FIRST_TASK_Y;
+
+    for(let i = 0; i < tasks.length; i++) {
+      const task = tasks[i]
+      this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord);
+      yCoord += this.constants.TASK_INTERLINE + this.constants.TASK_ARROW_HEIGHT / 2;
+
+      for(let j = 0; j < task.subtasks.length; j++) {
+        const subtask = task.subtasks[j];
+        yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT;
+        this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord);
+      }
+
+      yCoord += this.constants.SUBTASK_INTERLINE + this.constants.BASE_HEIGHT * 2;
+    }
   }
 
   /**

@@ -203,10 +203,11 @@ class Gantt extends Component {
 
   drawArrow(xStart, xEnd, yCoord, taskType, color) {
     let ARROW_HEIGHT = 0;
+    const strokeWidth = 1;
     
     if(taskType === this.constants.TASK)
       ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
-    else
+    else 
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
 
     const drawArc = (startDate, yCoord) => {
@@ -215,24 +216,29 @@ class Gantt extends Component {
         through: [xStart, yCoord],
         to: [xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2],
         strokeColor: color,
+        fillColor: color,
+        strokeWidth,
       });
+
+      if(taskType === this.constants.SUBTASK) {
+          arc.opacity = 0.5;
+      }
     }
 
     const drawLines = (xStart, xEnd, yCoord) => {
-      const lineUpStart = new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2);
-      const lineUpEnd = new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2);
+      const lineUpStart = new paper.Point(xStart + ARROW_HEIGHT / 2 + strokeWidth / 2, yCoord - ARROW_HEIGHT / 2);
+      const lineDownEnd = new paper.Point(xEnd - ARROW_HEIGHT - strokeWidth / 2, yCoord + ARROW_HEIGHT / 2);
 
-      const lineDownStart = new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2);
-      const lineDownEnd = new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2);
+      const rectangle = new paper.Path.Rectangle(lineUpStart, lineDownEnd);
+      rectangle.strokeColor = color;
+      rectangle.fillColor = color;
 
-      const lineUp = new paper.Path.Line(lineUpStart, lineUpEnd);
-      const lineDown = new paper.Path.Line(lineDownStart, lineDownEnd);
-
-      lineUp.strokeColor = color;
-      lineDown.strokeColor = color;
+      if(taskType === this.constants.SUBTASK) {
+          rectangle.opacity = 0.5;
+      }
     }
 
-    const drawArrowTip = (xEnd, yCoord, taskType) => {
+    const drawArrowTip = (xEnd, yCoord) => {
       let endPoint = new paper.Point(xEnd, yCoord);
 
       let anchorLength = 0;
@@ -242,7 +248,7 @@ class Gantt extends Component {
         anchorLength = 0.5 * this.constants.BASE_WIDTH;
       }
 
-      const curveUp = new paper.Path(
+      const tip = new paper.Path(
         new paper.Segment(
           new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
           null,
@@ -252,26 +258,30 @@ class Gantt extends Component {
           endPoint,
           null,
           null,
-        )
-      );
-      const curveDown = new paper.Path(
-        new paper.Segment(
-          new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
-          null,
-          new paper.Point(anchorLength, 0),
         ),
         new paper.Segment(
           endPoint,
           null,
           null,
-        )
+        ),
+        new paper.Segment(
+          new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
+          new paper.Point(anchorLength, 0),
+          null,
+        ),
       );
 
-      curveUp.strokeColor = color;
-      curveDown.strokeColor = color;
+      tip.strokeColor = new paper.Color(1, 0, 0, 1);
+      tip.fillColor = color;
+
+      if(taskType === this.constants.SUBTASK) {
+        tip.opacity = 0.5;
+        console.log(tip.fillColor, tip.strokeColor);
+      }
 
       return endPoint;
     }
+
 
     drawArc(xStart, yCoord);
     drawLines(xStart, xEnd, yCoord);

@@ -138,6 +138,29 @@ class Gantt extends Component {
           }
         ]
       },
+      {
+        title: "Task 3",
+        startDate: new Date('01/18/17'),
+        endDate: new Date('01/31/17'),
+        subtasks: []
+      },
+      {
+        title: "Task 4",
+        startDate: new Date('01/18/17'),
+        endDate: new Date('01/31/17'),
+        subtasks: [
+          {
+            title: "Subtask 2.1",
+            startDate: new Date('01/18/17'),
+            endDate: new Date('01/25/17'),
+          },
+          {
+            title: "Subtask 2.2",
+            startDate: new Date('01/25/17'),
+            endDate: new Date('01/31/17'),
+          }
+        ]
+      },
     ];
 
     let yCoord = this.constants.FIRST_TASK_Y;
@@ -145,15 +168,23 @@ class Gantt extends Component {
     for(let i = 0; i < tasks.length; i++) {
       const task = tasks[i]
       this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord);
-      yCoord += this.constants.TASK_INTERLINE + this.constants.TASK_ARROW_HEIGHT / 2;
 
-      for(let j = 0; j < task.subtasks.length; j++) {
-        const subtask = task.subtasks[j];
-        yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT;
-        this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord);
+      if(task.subtasks.length) {
+        yCoord += this.constants.TASK_ARROW_HEIGHT / 2 + this.constants.TASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT / 2;
+
+        for(let j = 0; j < task.subtasks.length; j++) {
+          const subtask = task.subtasks[j];
+          this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord);
+
+          if(j !== task.subtasks.length - 1)
+            yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT;
+        }
+
+        yCoord += this.constants.SUBTASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2;
+      } else {
+
+        yCoord += this.constants.TASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2;
       }
-
-      yCoord += this.constants.SUBTASK_INTERLINE + this.constants.BASE_HEIGHT * 2;
     }
   }
 

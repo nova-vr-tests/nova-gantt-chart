@@ -351,7 +351,7 @@ class Gantt extends Component {
         text.strokeColor = this.constants.TEXT_COLOR; 
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
-        text.content = startDate.getDate();
+        text.content = addDays(startDate, 1).getDate();
       } else if(i === numPoints + 1) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
         text.strokeColor = this.constants.TEXT_COLOR; 

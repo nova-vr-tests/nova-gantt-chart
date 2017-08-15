@@ -110,6 +110,7 @@ class Gantt extends Component {
         title: "Task 1",
         startDate: new Date('01/01/17'),
         endDate: new Date('01/18/17'),
+        color: 'red',
         subtasks: [
           {
             title: "Subtask 1.1",
@@ -127,6 +128,7 @@ class Gantt extends Component {
         title: "Task 2",
         startDate: new Date('01/18/17'),
         endDate: new Date('01/31/17'),
+        color: 'blue',
         subtasks: [
           {
             title: "Subtask 2.1",
@@ -143,13 +145,15 @@ class Gantt extends Component {
       {
         title: "Task 3",
         startDate: new Date('01/18/17'),
-        endDate: new Date('01/31/17'),
+        endDate: new Date('02/08/17'),
+        color: 'green',
         subtasks: []
       },
       {
         title: "Task 4",
         startDate: new Date('01/18/17'),
         endDate: new Date('01/31/17'),
+        color: 'yellow',
         subtasks: [
           {
             title: "Subtask 2.1",
@@ -169,14 +173,14 @@ class Gantt extends Component {
 
     for(let i = 0; i < tasks.length; i++) {
       const task = tasks[i]
-      this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, 'red');
+      this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, task.color);
 
       if(task.subtasks.length) {
         yCoord += this.constants.TASK_ARROW_HEIGHT / 2 + this.constants.TASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT / 2;
 
         for(let j = 0; j < task.subtasks.length; j++) {
           const subtask = task.subtasks[j];
-          this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, 'red');
+          this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, task.color);
 
           if(j !== task.subtasks.length - 1)
             yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT;
@@ -202,90 +206,91 @@ class Gantt extends Component {
   }
 
   drawArrow(xStart, xEnd, yCoord, taskType, color) {
-    let ARROW_HEIGHT = 0;
     const strokeWidth = 1;
-    
-    if(taskType === this.constants.TASK)
+
+    let ARROW_HEIGHT = 0;
+    let tipAnchorLength = 0;
+    let opacity = 1;
+    let fillColor = color;
+    if(taskType === this.constants.TASK) {
       ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
-    else 
+      tipAnchorLength = 0.75 * this.constants.BASE_WIDTH;
+    } else {
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
-
-    const drawArc = (startDate, yCoord) => {
-      var arc = new paper.Path.Arc({
-        from: [xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2],
-        through: [xStart, yCoord],
-        to: [xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2],
-        strokeColor: color,
-        fillColor: color,
-        strokeWidth,
-      });
-
-      if(taskType === this.constants.SUBTASK) {
-          arc.opacity = 0.5;
-      }
+      tipAnchorLength = 0.5 * this.constants.BASE_WIDTH;
+      opacity = 0.5;
     }
 
-    const drawLines = (xStart, xEnd, yCoord) => {
-      const lineUpStart = new paper.Point(xStart + ARROW_HEIGHT / 2 + strokeWidth / 2, yCoord - ARROW_HEIGHT / 2);
-      const lineDownEnd = new paper.Point(xEnd - ARROW_HEIGHT - strokeWidth / 2, yCoord + ARROW_HEIGHT / 2);
-
-      const rectangle = new paper.Path.Rectangle(lineUpStart, lineDownEnd);
-      rectangle.strokeColor = color;
-      rectangle.fillColor = color;
-
-      if(taskType === this.constants.SUBTASK) {
-          rectangle.opacity = 0.5;
-      }
-    }
-
-    const drawArrowTip = (xEnd, yCoord) => {
-      let endPoint = new paper.Point(xEnd, yCoord);
-
-      let anchorLength = 0;
-      if(taskType === this.constants.TASK) {
-        anchorLength = 0.75 * this.constants.BASE_WIDTH;
-      } else {
-        anchorLength = 0.5 * this.constants.BASE_WIDTH;
-      }
-
-      const tip = new paper.Path(
-        new paper.Segment(
-          new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
-          null,
-          new paper.Point(anchorLength, 0),
-        ),
-        new paper.Segment(
-          endPoint,
-          null,
-          null,
-        ),
-        new paper.Segment(
-          endPoint,
-          null,
-          null,
-        ),
-        new paper.Segment(
-          new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
-          new paper.Point(anchorLength, 0),
-          null,
-        ),
-      );
-
-      tip.strokeColor = new paper.Color(1, 0, 0, 1);
-      tip.fillColor = color;
-
-      if(taskType === this.constants.SUBTASK) {
-        tip.opacity = 0.5;
-        console.log(tip.fillColor, tip.strokeColor);
-      }
-
-      return endPoint;
-    }
+    let endPoint = new paper.Point(xEnd, yCoord);
 
 
-    drawArc(xStart, yCoord);
-    drawLines(xStart, xEnd, yCoord);
-    return drawArrowTip(xEnd, yCoord);
+    const arrow = new paper.Path(
+      // Bottom arc 
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2),
+        null,
+        new paper.Point(-0.55228 * ARROW_HEIGHT / 2, 0),
+      ),
+      new paper.Segment(
+        new paper.Point(xStart, yCoord),
+        new paper.Point(0, 0.55228 * ARROW_HEIGHT / 2),
+        null,
+      ),
+      // Top arc
+      new paper.Segment(
+        new paper.Point(xStart, yCoord),
+        null,
+        new paper.Point(0, -0.55228 * ARROW_HEIGHT / 2),
+      ),
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2),
+        new paper.Point(-0.55228 * ARROW_HEIGHT / 2, 0),
+        null,
+      ),
+      // Top line
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2),
+      ),
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
+      ),
+      // Top arrow tip
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
+        null,
+        new paper.Point(tipAnchorLength, 0),
+      ),
+      new paper.Segment(
+        endPoint,
+        null,
+        null,
+      ),
+      // Bottom arrow tip
+      new paper.Segment(
+        endPoint,
+        null,
+        null,
+      ),
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
+        new paper.Point(tipAnchorLength, 0),
+        null,
+      ),
+      // Bottom line
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
+      ),
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2),
+      )
+    );
+
+    arrow.strokeColor = color;
+    arrow.fillColor = color;
+    arrow.opacity = opacity;
+
+
+    return endPoint;
   }
 
   /**

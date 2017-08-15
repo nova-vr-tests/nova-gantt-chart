@@ -209,19 +209,19 @@ class Gantt extends Component {
 
     const drawArc = (startDate, yCoord) => {
       var arc = new paper.Path.Arc({
-        from: [xStart, yCoord - ARROW_HEIGHT / 2],
-        through: [xStart - ARROW_HEIGHT / 2, yCoord],
-        to: [xStart, yCoord + ARROW_HEIGHT / 2],
+        from: [xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2],
+        through: [xStart, yCoord],
+        to: [xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2],
         strokeColor: 'black'
       });
     }
 
     const drawLines = (xStart, xEnd, yCoord) => {
-      const lineUpStart = new paper.Point(xStart, yCoord - ARROW_HEIGHT / 2);
-      const lineUpEnd = new paper.Point(xEnd, yCoord - ARROW_HEIGHT / 2);
+      const lineUpStart = new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2);
+      const lineUpEnd = new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2);
 
-      const lineDownStart = new paper.Point(xStart, yCoord + ARROW_HEIGHT / 2);
-      const lineDownEnd = new paper.Point(xEnd, yCoord + ARROW_HEIGHT / 2);
+      const lineDownStart = new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2);
+      const lineDownEnd = new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2);
 
       const lineUp = new paper.Path.Line(lineUpStart, lineUpEnd);
       const lineDown = new paper.Path.Line(lineDownStart, lineDownEnd);
@@ -230,14 +230,21 @@ class Gantt extends Component {
       lineDown.strokeColor = 'black';
     }
 
-    const drawArrowTip = (xEnd, yCoord) => {
-      const endPoint = new paper.Point(xEnd + this.constants.BASE_WIDTH, yCoord);
+    const drawArrowTip = (xEnd, yCoord, taskType) => {
+      let endPoint = new paper.Point(xEnd, yCoord);
+
+      let anchorLength = 0;
+      if(taskType === this.constants.TASK) {
+        anchorLength = 0.75 * this.constants.BASE_WIDTH;
+      } else {
+        anchorLength = 0.5 * this.constants.BASE_WIDTH;
+      }
 
       const curveUp = new paper.Path(
         new paper.Segment(
-          new paper.Point(xEnd, yCoord - ARROW_HEIGHT / 2),
+          new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
           null,
-          new paper.Point(10, 0),
+          new paper.Point(anchorLength, 0),
         ),
         new paper.Segment(
           endPoint,
@@ -247,9 +254,9 @@ class Gantt extends Component {
       );
       const curveDown = new paper.Path(
         new paper.Segment(
-          new paper.Point(xEnd, yCoord + ARROW_HEIGHT / 2),
+          new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
           null,
-          new paper.Point(10, 0),
+          new paper.Point(anchorLength, 0),
         ),
         new paper.Segment(
           endPoint,

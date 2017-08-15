@@ -47,12 +47,12 @@ class Gantt extends Component {
 
     // Task title coords
     this.constants.TASK_TITLE_START_OFFSET = {
-      x: this.constants.TASK_ARROW_HEIGHT / 2 + 4,
+      x: this.constants.TASK_ARROW_HEIGHT / 0.75,
       y: this.constants.TASK_FONT_SIZE / 2.5,
     }
 
     this.constants.SUBTASK_TITLE_START_OFFSET = {
-      x: this.constants.SUBTASK_ARROW_HEIGHT / 2 + 3,
+      x: this.constants.SUBTASK_ARROW_HEIGHT / 0.75,
       y: this.constants.SUBTASK_FONT_SIZE / 2.5,
     }
 
@@ -298,8 +298,8 @@ class Gantt extends Component {
       TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
     }
 
-    const arrowEndPoint = this.drawArrow(ARROW_START, 100, yCoord, taskType);
-    const circle = paper.Path.Circle(new paper.Point(ARROW_START, yCoord), ARROW_HEIGHT / 2);
+    const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType);
+    const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
     circle.fillColor = 'black';
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
 
@@ -331,13 +331,13 @@ class Gantt extends Component {
   drawTaskLine(taskName, startDate, endDate, yCoord) {
     this.drawTaskArrow(addDays(startDate, -1), addDays(endDate, +1), yCoord, this.constants.TASK);
     const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK);
-    this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate) - this.constants.BASE_WIDTH / 2, yCoord);
+    this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);
   }
 
   drawSubtaskLine(subtaskName, startDate, endDate, yCoord) {
     this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK);
     const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK);
-    this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate) - this.constants.BASE_WIDTH / 2, yCoord);
+    this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);
   }
 
   render() {

@@ -12,7 +12,7 @@ const addDays = (dat, jump) => {
 const diffInDays = (startDate, endDate) => {
   const diff = endDate - startDate;    // milliseconds
 
-  return diff / (1000*60*60*24);
+  return diff / (1000 * 60 * 60 * 24);
 }
 
 class Gantt extends Component {
@@ -23,15 +23,22 @@ class Gantt extends Component {
     this.constants = {};
     // Base dimensions
     this.constants.BASE_HEIGHT = 12;                // task arrow height
-    this.constants.BASE_WIDTH = 15;                 // x-coord difference between 2 days 
+    this.constants.BASE_WIDTH = 14;                 // x-coord difference between 2 days 
 
     // Arrow dimensions
     this.constants.TASK_ARROW_HEIGHT = 1.5 * this.constants.BASE_HEIGHT;
     this.constants.SUBTASK_ARROW_HEIGHT = 1 * this.constants.BASE_HEIGHT;
+    this.constants.CALENDAR_ARROW_HEIGHT = 2 * this.constants.BASE_HEIGHT;
     this.constants.TASK_TITLE_START = 20;
     this.constants.SUBTASK_TITLE_START = 40;
     this.constants.DATE_GRADUATION_START = 200;     // where date graduation starts
-    this.constants.TASK_ARROW_POINT_DIAMETER = 5;
+    this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT;
+    this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER;
+    this.constants.CALENDAR_GRADUATION_START = 10;
+
+    // Colors
+    this.constants.CALENDAR_BG_COLOR = '#A8A898';
+    this.constants.CALENDAR_TEXT_COLOR = '#999999';
 
 
     // Spaces beween tasks
@@ -41,15 +48,16 @@ class Gantt extends Component {
     // Fonts
     this.constants.TASK_FONT_SIZE = 9;
     this.constants.SUBTASK_FONT_SIZE = 7;
+    this.constants.CALENDAR_GRADUATION_FONT_SIZE = 10;
 
     this.constants.FONT_FAMILY = 'Courier New';
     this.constants.FONT_STROKE_WIDTH = 0.4,
 
-    // Task title coords
-    this.constants.TASK_TITLE_START_OFFSET = {
-      x: this.constants.TASK_ARROW_HEIGHT / 0.75,
-      y: this.constants.TASK_FONT_SIZE / 2.5,
-    }
+      // Task title coords
+      this.constants.TASK_TITLE_START_OFFSET = {
+        x: this.constants.TASK_ARROW_HEIGHT / 0.75,
+        y: this.constants.TASK_FONT_SIZE / 2.5,
+      }
 
     this.constants.SUBTASK_TITLE_START_OFFSET = {
       x: this.constants.SUBTASK_ARROW_HEIGHT / 0.75,
@@ -59,19 +67,25 @@ class Gantt extends Component {
     // Line type
     this.constants.TASK = 0;
     this.constants.SUBTASK = 1;
-    
+    this.constants.CALENDAR = 2;
+
 
     // Date constants
     this.constants.START_DATE = new Date('01/01/17');
 
     // Other constants
     this.constants.FIRST_TASK_Y = 50;
-    this.constants.TEXT_COLOR_OPACITY = new paper.Color(255, 255, 255, 0.5);
+    this.constants.TEXT_OPACITY = 0.5;
+    this.constants.TEXT_COLOR_OPACITY = new paper.Color(255, 255, 255, this.constants.TEXT_OPACITY);
     this.constants.TEXT_COLOR = 'white';
+    this.constants.DATE_GRADUATION_Y_COORD = this.constants.CALENDAR_ARROW_HEIGHT / 2 * 0.75;
+    this.constants.CALENDAR_POINTS_BEFORE_START = 9;
+    this.constants.CALENDAR_POINTS_AFTER_END = 3;
 
     this.dateToXCoord = this.dateToXCoord.bind(this);
     this.drawAllTasks = this.drawAllTasks.bind(this);
     this.drawArrow = this.drawArrow.bind(this);
+    this.drawCalendarLine = this.drawCalendarLine.bind(this);
     this.drawDashedLine = this.drawDashedLine.bind(this);
     this.drawTaskArrow = this.drawTaskArrow.bind(this);
     this.drawTaskArrowPoints = this.drawTaskArrowPoints.bind(this);
@@ -90,18 +104,13 @@ class Gantt extends Component {
   setupCanvas() {
     // Get a reference to the canvas object
     var canvas = document.getElementById('gantt-canvas');
-		// Create an empty project and a view for the canvas:
+    // Create an empty project and a view for the canvas:
     paper.setup(canvas);
-
-
-    // this.drawTaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), this.constants.FIRST_TASK_Y);
-    // this.drawSubtaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), this.constants.FIRST_TASK_Y + this.constants.TASK_ARROW_HEIGHT);
-    // this.drawSubtaskLine("Task 1", this.constants.START_DATE, new Date('02/02/17'), this.constants.FIRST_TASK_Y + this.constants.SUBTASK_ARROW_HEIGHT);
 
     this.drawAllTasks();
 
-		// Draw the view now:
-		paper.view.draw();
+    // Draw the view now:
+    paper.view.draw();
   }
 
   drawAllTasks() {
@@ -164,6 +173,11 @@ class Gantt extends Component {
             title: "Subtask 2.2",
             startDate: new Date('01/25/17'),
             endDate: new Date('01/31/17'),
+          },
+          {
+            title: "Subtask 2.3",
+            startDate: new Date('01/20/17'),
+            endDate: new Date('01/28/17'),
           }
         ]
       },
@@ -171,18 +185,18 @@ class Gantt extends Component {
 
     let yCoord = this.constants.FIRST_TASK_Y;
 
-    for(let i = 0; i < tasks.length; i++) {
+    for (let i = 0; i < tasks.length; i++) {
       const task = tasks[i]
       this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, task.color);
 
-      if(task.subtasks.length) {
+      if (task.subtasks.length) {
         yCoord += this.constants.TASK_ARROW_HEIGHT / 2 + this.constants.TASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT / 2;
 
-        for(let j = 0; j < task.subtasks.length; j++) {
+        for (let j = 0; j < task.subtasks.length; j++) {
           const subtask = task.subtasks[j];
           this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, task.color);
 
-          if(j !== task.subtasks.length - 1)
+          if (j !== task.subtasks.length - 1)
             yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT;
         }
 
@@ -192,6 +206,9 @@ class Gantt extends Component {
         yCoord += this.constants.TASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2;
       }
     }
+
+    yCoord += this.constants.BASE_HEIGHT * 2;
+    this.drawCalendarLine(tasks[0].startDate, tasks[tasks.length - 1].endDate, yCoord);
   }
 
   /**
@@ -212,13 +229,16 @@ class Gantt extends Component {
     let tipAnchorLength = 0;
     let opacity = 1;
     let fillColor = color;
-    if(taskType === this.constants.TASK) {
+    if (taskType === this.constants.TASK) {
       ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
       tipAnchorLength = 0.75 * this.constants.BASE_WIDTH;
-    } else {
+    } else if (taskType === this.constants.SUBTASK) {
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
       tipAnchorLength = 0.5 * this.constants.BASE_WIDTH;
       opacity = 0.5;
+    } else if (taskType === this.constants.CALENDAR) {
+      ARROW_HEIGHT = this.constants.CALENDAR_ARROW_HEIGHT;
+      tipAnchorLength = 1.0 * this.constants.BASE_WIDTH;
     }
 
     let endPoint = new paper.Point(xEnd, yCoord);
@@ -288,7 +308,7 @@ class Gantt extends Component {
     arrow.strokeColor = color;
     arrow.opacity = opacity;
 
-    if(isFilled)
+    if (isFilled)
       arrow.fillColor = color;
 
 
@@ -308,7 +328,7 @@ class Gantt extends Component {
   drawTaskTitle(title, yCoord, taskType = this.constants.TASK, color) {
     let ARROW_HEIGHT, ARROW_START, TEXT_START;
 
-    if(taskType === this.constants.TASK) {
+    if (taskType === this.constants.TASK) {
       ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
       ARROW_START = this.constants.TASK_TITLE_START;
       TEXT_START = this.constants.TASK_TITLE_START_OFFSET;
@@ -320,11 +340,11 @@ class Gantt extends Component {
 
     const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType, color, false);
     const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
-    circle.fillColor = color; 
+    circle.fillColor = color;
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
 
 
-    if(taskType === this.constants.TASK) {
+    if (taskType === this.constants.TASK) {
       text.strokeColor = color;
       text.content = title;
       text.fontSize = this.constants.TASK_FONT_SIZE;
@@ -355,18 +375,18 @@ class Gantt extends Component {
     const points = [];
     const numPoints = Math.floor(diffInDays(startDate, endDate) / 8);
 
-    for(let i = 0; i <= numPoints + 1; i++) {
-      if(i === 0) {
+    for (let i = 0; i <= numPoints + 1; i++) {
+      if (i === 0) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
-        text.strokeColor = this.constants.TEXT_COLOR; 
+        text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(startDate, 1).getDate();
         text.fillColor = 'white';
         text.opacity = 0.5;
-      } else if(i === numPoints + 1) {
+      } else if (i === numPoints + 1) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
-        text.strokeColor = this.constants.TEXT_COLOR; 
+        text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(endDate, -1).getDate();
@@ -398,11 +418,52 @@ class Gantt extends Component {
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);
   }
 
+  drawCalendarLine(startDate, endDate, yCoord) {
+    this.drawArrow(this.constants.TASK_TITLE_START, this.dateToXCoord(endDate) + 4 * this.constants.BASE_WIDTH, yCoord, this.constants.CALENDAR, this.constants.CALENDAR_BG_COLOR);
+
+    const drawCalendarGraduation = () => {
+      const points = [];
+      const mondays = [];
+
+      const deltaDays = diffInDays(startDate, endDate);
+      const pointYCoord = yCoord - this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.DATE_GRADUATION_Y_COORD;
+
+      let m = 0;
+      const date_m = new Date(startDate);
+      addDays(date_m, -this.constants.CALENDAR_POINTS_BEFORE_START);
+      for(let i = -this.constants.CALENDAR_POINTS_BEFORE_START; i < deltaDays + this.constants.CALENDAR_POINTS_AFTER_END; i++) {
+        const x = this.constants.DATE_GRADUATION_START + i * this.constants.BASE_WIDTH;
+        // Show point of not Monday
+        if(date_m.getDay() !== 0) {
+          points[i] = new paper.Path.Circle(
+            new paper.Point(x, pointYCoord), 
+            this.constants.CALENDAR_ARROW_POINT_DIAMETER / 2,
+          );         
+
+          points[i].fillColor = 'black';
+          points[i].opacity = this.constants.TEXT_OPACITY;
+        } else {
+          mondays[m] = new paper.PointText(new paper.Point(x - this.constants.CALENDAR_GRADUATION_FONT_SIZE / 1.5, yCoord));
+          mondays[m].content = (date_m.getDate() + '').length < 2 ? "0" + date_m.getDate() : date_m.getDate();
+          mondays[m].fillColor = 'black';
+          mondays[m].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE;
+          mondays[m].strokeWidth = 1;
+          mondays[m].opacity = this.constants.TEXT_OPACITY;
+          m++;
+        }
+
+        addDays(date_m, 1);
+      }
+    }
+
+    drawCalendarGraduation();
+  }
+
   render() {
     return (
       <div className="gantt">
         <h1>Gantt</h1>
-        <canvas id="gantt-canvas" height={ 1000 } width={ 2000 }></canvas>
+        <canvas id="gantt-canvas" height={1000} width={2000}></canvas>
       </div>
     );
   }

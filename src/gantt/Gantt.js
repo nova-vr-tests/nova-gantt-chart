@@ -3,9 +3,8 @@ import './Gantt.css';
 
 import paper from 'paper';
 
-const addDays = days => {
-  var dat = new Date(this.valueOf());
-  dat.setDate(dat.getDate() + days);
+const addDays = (dat, jump) => {
+  dat.setDate(dat.getDate() + jump);
 
   return dat;
 }
@@ -330,7 +329,7 @@ class Gantt extends Component {
   }
 
   drawTaskLine(taskName, startDate, endDate, yCoord) {
-    this.drawTaskArrow(startDate, endDate, yCoord, this.constants.TASK);
+    this.drawTaskArrow(addDays(startDate, -1), addDays(endDate, +1), yCoord, this.constants.TASK);
     const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK);
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate) - this.constants.BASE_WIDTH / 2, yCoord);
   }

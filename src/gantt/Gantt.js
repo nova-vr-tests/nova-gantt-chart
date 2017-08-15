@@ -110,7 +110,7 @@ class Gantt extends Component {
         title: "Task 1",
         startDate: new Date('01/01/17'),
         endDate: new Date('01/18/17'),
-        color: 'red',
+        color: '#65B766',
         subtasks: [
           {
             title: "Subtask 1.1",
@@ -128,7 +128,7 @@ class Gantt extends Component {
         title: "Task 2",
         startDate: new Date('01/18/17'),
         endDate: new Date('01/31/17'),
-        color: 'blue',
+        color: '#59AF92',
         subtasks: [
           {
             title: "Subtask 2.1",
@@ -146,14 +146,14 @@ class Gantt extends Component {
         title: "Task 3",
         startDate: new Date('01/18/17'),
         endDate: new Date('02/08/17'),
-        color: 'green',
+        color: '#59A4AF',
         subtasks: []
       },
       {
         title: "Task 4",
         startDate: new Date('01/18/17'),
         endDate: new Date('01/31/17'),
-        color: 'yellow',
+        color: '#5888B3',
         subtasks: [
           {
             title: "Subtask 2.1",

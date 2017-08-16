@@ -320,14 +320,15 @@ class Gantt extends Component {
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
-        text.content = addDays(startDate, 1).getDate();
+        // text.content = addDays(startDate, 1).getDate();
+        text.content = (addDays(startDate, 1).getDate() + '').length < 2 ? '0' + startDate.getDate() : startDate.getDate();
         text.fillColor = this.constants.TEXT_COLOR;
       } else if (i === numPoints) {
-        const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
+        const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2 - 3, yCoord + 4));
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
-        text.content = addDays(endDate, -1).getDate();
+        text.content = (addDays(endDate, -1).getDate() + '').length < 2 ? '0' + endDate.getDate() : endDate.getDate();
         text.fillColor = this.constants.TEXT_COLOR;
       } else {
         points[i] = new paper.Path.Circle(

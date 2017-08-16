@@ -262,34 +262,37 @@ class Gantt extends Component {
   }
 
   drawTaskTitle(title, yCoord, taskType = this.constants.TASK, color) {
-    let ARROW_HEIGHT, ARROW_START, TEXT_START;
+    let ARROW_HEIGHT, ARROW_START, TEXT_START, FONT_SIZE, TIP_LENGTH;
 
     if (taskType === this.constants.TASK) {
       ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
       ARROW_START = this.constants.TASK_TITLE_START;
       TEXT_START = this.constants.TASK_TITLE_START_OFFSET;
+      FONT_SIZE = this.constants.TASK_FONT_SIZE;
+      TIP_LENGTH = 35;
     } else {
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
       ARROW_START = this.constants.SUBTASK_TITLE_START;
       TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
+      FONT_SIZE = this.constants.SUBTASK_FONT_SIZE;
+      TIP_LENGTH = 25;
     }
 
-    const arrowEndPoint = this.drawArrow(ARROW_START, 130, yCoord, taskType, color, false);
+    const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
+    text.content = title;
+    text.fontSize = FONT_SIZE;
+    console.log(text.bounds)
+    const arrowEndPoint = this.drawArrow(ARROW_START, ARROW_START + text.bounds.right - text.bounds.left + ARROW_HEIGHT / 2 + TIP_LENGTH, yCoord, taskType, color, false);
     const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
     circle.fillColor = color;
-    const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
 
 
     if (taskType === this.constants.TASK) {
       text.strokeColor = color;
-      text.content = title;
-      text.fontSize = this.constants.TASK_FONT_SIZE;
       text.fontFamily = this.constants.FONT_FAMILY;
       text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
     } else {
       text.strokeColor = color;
-      text.content = title;
-      text.fontSize = this.constants.SUBTASK_FONT_SIZE;
       text.fontFamily = this.constants.FONT_FAMILY;
       text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
     }

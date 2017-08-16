@@ -446,9 +446,11 @@ class Gantt extends Component {
       ];
 
       // Show first month
+      const n = startDate.getMonth();
       for(let i = 0; i < monthGraduation.length + 1; i++) {
         months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2.5 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
-        months[i].content = monthsNames[i % 12 ? i % 12 - 1: 11];
+        const m = n + i;
+        months[i].content = monthsNames[m % 12 ? m % 12 - 1: 11];
 
         if(i === 0) {
           if(months[i].bounds.right < monthGraduation[0].bounds.left) {

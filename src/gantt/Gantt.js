@@ -81,6 +81,9 @@ class Gantt extends Component {
     this.constants.DATE_GRADUATION_Y_COORD = this.constants.CALENDAR_ARROW_HEIGHT / 2 * 0.75;
     this.constants.CALENDAR_POINTS_BEFORE_START = 9;
     this.constants.CALENDAR_POINTS_AFTER_END = 3;
+    this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8;
+    this.constants.CALENDAR_MONTH_FONT_SIZE = 12;
+    this.constants.CALENDAR_YEAR_FONT_SIZE = 18;
 
     this.dateToXCoord = this.dateToXCoord.bind(this);
     this.drawAllTasks = this.drawAllTasks.bind(this);
@@ -424,15 +427,33 @@ class Gantt extends Component {
     const drawCalendarGraduation = () => {
       const points = [];
       const mondays = [];
+      const monthGraduation = [];
+      let year;
 
       const deltaDays = diffInDays(startDate, endDate);
       const pointYCoord = yCoord - this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.DATE_GRADUATION_Y_COORD;
 
-      let m = 0;
+      let m = 0;     // monday increment
       const date_m = new Date(startDate);
+      let j = 0;    // months increment
+      const i_0 =  -this.constants.CALENDAR_POINTS_BEFORE_START;
       addDays(date_m, -this.constants.CALENDAR_POINTS_BEFORE_START);
-      for(let i = -this.constants.CALENDAR_POINTS_BEFORE_START; i < deltaDays + this.constants.CALENDAR_POINTS_AFTER_END; i++) {
+      for(let i = i_0; i < deltaDays + this.constants.CALENDAR_POINTS_AFTER_END; i++) {
         const x = this.constants.DATE_GRADUATION_START + i * this.constants.BASE_WIDTH;
+
+        // Write year on first graduation
+        if(i === i_0) {
+          year = new paper.PointText(new paper.Point(
+            x,
+            yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_YEAR_FONT_SIZE / 2,
+          ));
+
+          year.fontSize = this.constants.CALENDAR_YEAR_FONT_SIZE;
+          year.fillColor = new paper.Color(0,0,0,0.5);
+          year.strokeWidth = 1;
+          year.content = date_m.getFullYear();
+        }
+
         // Show point of not Monday
         if(date_m.getDay() !== 0) {
           points[i] = new paper.Path.Circle(
@@ -450,6 +471,18 @@ class Gantt extends Component {
           mondays[m].strokeWidth = 1;
           mondays[m].opacity = this.constants.TEXT_OPACITY;
           m++;
+        }
+
+        if(date_m.getDate() === 1) {
+          monthGraduation[j] = new paper.Path.Line(
+            new paper.Point(x, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 - this.constants.CALENDAR_MONTH_MARK_HEIGHT / 2),
+            new paper.Point(x, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_MONTH_MARK_HEIGHT / 2),
+          );
+
+          monthGraduation[j].strokeColor = 'black';
+          monthGraduation[j].strokeWidth = 3;
+          monthGraduation[j].opacity = this.constants.TEXT_OPACITY;
+          monthGraduation[j].strokeCap = 'round';
         }
 
         addDays(date_m, 1);

@@ -6,7 +6,7 @@ import Gantt from './gantt/Gantt';
 
 class App extends Component {
   render() {
-    const initDate = () => new Date('10/09/17');
+    const initDate = () => new Date('09/01/17');
     const week = weeks => new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
 
     const tasks = [
@@ -36,7 +36,7 @@ class App extends Component {
       {
         title: "Design spec",
         startDate: week(3),
-        endDate: week(15),
+        endDate: week(14),
         color: '#5888B3',
         subtasks: [
           {
@@ -64,33 +64,33 @@ class App extends Component {
       {
         title: "Training",
         startDate: week(2),
-        endDate: week(15),
+        endDate: week(14),
         color: '#6b71b4',
         subtasks: [
           {
             title: 'Getting started',
             startDate: week(2),
-            endDate: week(5),
+            endDate: week(4),
           },
           {
             title: 'Hardware',
-            startDate: week(5),
-            endDate: week(8),
+            startDate: week(4),
+            endDate: week(7),
           },
           {
             title: 'Software',
-            startDate: week(8),
-            endDate: week(11),
+            startDate: week(7),
+            endDate: week(10),
           },
           {
             title: 'Theory',
-            startDate: week(11),
-            endDate: week(14),
+            startDate: week(10),
+            endDate: week(13),
           },
           {
             title: 'Lab',
-            startDate: week(14),
-            endDate: week(15),
+            startDate: week(13),
+            endDate: week(14),
           },
         ]
       },

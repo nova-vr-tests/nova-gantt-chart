@@ -13,87 +13,94 @@ class App extends Component {
       {
         title: "Hardware install",
         startDate: week(0),
-        endDate: week(2),
+        endDate: week(3),
         color: '#65B766',
         subtasks: [
         ]
       },
       {
-        title: "Define expectation",
+        title: "Needs analysis",
         startDate: week(0),
-        endDate: week(3),
+        endDate: week(4),
         color: '#59AF92',
         subtasks: [
         ]
       },
       {
-        title: "Exp BGRS tour",
-        startDate: week(3),
-        endDate: week(5),
+        title: "BGRS tour",
+        startDate: week(1),
+        endDate: week(4),
         color: '#59A4AF',
         subtasks: []
       },
       {
-        title: "Hard Mop creative",
-        startDate: week(5),
-        endDate: week(13),
+        title: "Design spec",
+        startDate: week(3),
+        endDate: week(15),
         color: '#5888B3',
         subtasks: [
           {
-            title: "Sketch design",
-            startDate: week(5),
-            endDate: week(6),
+            title: "Script",
+            startDate: week(3),
+            endDate: week(7),
+          }, 
+          {
+            title: "Graphic charters",
+            startDate: week(3),
+            endDate: week(11),
           },
           {
-            title: "Intro tech restrictions",
-            startDate: week(5),
-            endDate: week(6),
+            title: "Feasibility analysis",
+            startDate: week(14),
+            endDate: week(15),
           },
           {
-            title: "Gameplay",
+            title: "Technical specification",
             startDate: week(5),
-            endDate: week(10),
-          }, 
-          {
-            title: "Environments",
-            startDate: week(6),
-            endDate: week(8),
-          }, 
-          {
-            title: "Storyline",
-            startDate: week(5),
-            endDate: week(9),
-          }, 
-          {
-            title: "Concept art",
-            startDate: week(6),
-            endDate: week(13),
+            endDate: week(14),
           }, 
         ]
       },
       {
-        title: "Development",
-        startDate: week(6),
-        endDate: week(13),
-        color: '#5888B3',
+        title: "Training",
+        startDate: week(3),
+        endDate: week(15),
+        color: '#6b71b4',
         subtasks: [
           {
-            title: "Integration",
-            startDate: week(6),
+            title: 'Getting started',
+            startDate: week(3),
+            endDate: week(5),
+          },
+          {
+            title: 'Hardware',
+            startDate: week(5),
+            endDate: week(8),
+          },
+          {
+            title: 'Software',
+            startDate: week(8),
             endDate: week(11),
           },
           {
-            title: "Asset integration",
-            startDate: week(8),
-            endDate: week(12),
+            title: 'Theory',
+            startDate: week(11),
+            endDate: week(14),
           },
           {
-            title: "Testing",
-            startDate: week(9),
-            endDate: week(13),
-          }, 
-        ],
+            title: 'Lab',
+            startDate: week(14),
+            endDate: week(15),
+          },
+        ]
       },
+      {
+        title: 'Final restitution',
+        startDate: week(15),
+        endDate: week(16),
+        subtasks: [],
+        color: '#926cad',
+      }
     ];
 
     const orderTasks = tasks_original => {

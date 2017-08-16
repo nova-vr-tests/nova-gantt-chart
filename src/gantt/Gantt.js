@@ -152,7 +152,13 @@ class Gantt extends Component {
   }
 
   exportGanttToSVG() {
-    console.log(paper.project.exportSVG());
+    const svg = paper.project.exportSVG();
+    console.log(svg);
+
+    const range = document.createRange();
+    range.selectNode(document.getElementById('svg'));
+    range.insertNode(svg);
+
   }
 
   /**
@@ -446,10 +452,10 @@ class Gantt extends Component {
       ];
 
       // Show first month
-      const n = startDate.getMonth();
+      const n = startDate.getMonth(); // Start month number
       for(let i = 0; i < monthGraduation.length + 1; i++) {
         months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2.5 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
-        const m = n + i;
+        const m = n + i; // Current month number
         months[i].content = monthsNames[m % 12 ? m % 12 - 1: 11];
 
         if(i === 0) {
@@ -506,7 +512,8 @@ class Gantt extends Component {
     return (
       <div className="gantt">
         <h1>Gantt</h1>
-        <canvas id="gantt-canvas" height={1000} width={2000}></canvas>
+        <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'none' }}></canvas>
+        <div id="svg"></div>
       </div>
     );
   }

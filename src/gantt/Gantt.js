@@ -309,7 +309,7 @@ class Gantt extends Component {
 
   drawTaskArrowPoints(startDate, endDate, yCoord) {
     const points = [];
-    const numPoints = Math.floor(diffInDays(startDate, endDate) / 8);
+    const numPoints = Math.floor(diffInDays(startDate, endDate) / 7);
 
     for (let i = 0; i <= numPoints + 1; i++) {
       if (i === 0) {
@@ -319,7 +319,7 @@ class Gantt extends Component {
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(startDate, 1).getDate();
         text.fillColor = this.constants.TEXT_COLOR;
-      } else if (i === numPoints + 1) {
+      } else if (i === numPoints) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;

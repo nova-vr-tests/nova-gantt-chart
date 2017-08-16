@@ -79,7 +79,7 @@ class Gantt extends Component {
     this.constants.TEXT_COLOR_OPACITY = new paper.Color(255, 255, 255, this.constants.TEXT_OPACITY);
     this.constants.TEXT_COLOR = 'white';
     this.constants.DATE_GRADUATION_Y_COORD = this.constants.CALENDAR_ARROW_HEIGHT / 2 * 0.75;
-    this.constants.CALENDAR_POINTS_BEFORE_START = 6;
+    this.constants.CALENDAR_POINTS_BEFORE_START = 7;
     this.constants.CALENDAR_POINTS_AFTER_END = 2;
     this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8;
     this.constants.CALENDAR_MONTH_FONT_SIZE = 12;
@@ -473,8 +473,18 @@ class Gantt extends Component {
       }
     }
 
+    const drawLogo = () => {
+      const logo = new paper.Path.Circle(
+        new paper.Point(this.constants.TASK_TITLE_START + this.constants.CALENDAR_ARROW_HEIGHT / 2, yCoord),
+        this.constants.CALENDAR_ARROW_HEIGHT / 3,
+      );
+      logo.fillColor = 'black';
+      logo.opacity = this.constants.TEXT_OPACITY;
+    }
+
     drawCalendarGraduation();
     drawMonths();
+    drawLogo();
   }
 
   render() {

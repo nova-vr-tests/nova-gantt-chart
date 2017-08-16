@@ -9,7 +9,7 @@ class App extends Component {
     const initDate = () => new Date('10/09/17');
     const week = weeks => new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
 
-    let tasks = [
+    const tasks = [
       {
         title: "Hardware install",
         startDate: week(0),
@@ -96,7 +96,9 @@ class App extends Component {
       },
     ];
 
-    const orderTasks = tasks => {
+    const orderTasks = tasks_original => {
+      const tasks = [...tasks_original];
+
       tasks.sort((a, b) => a.startDate - b.startDate);
 
       for(let i = 0; i < tasks.length; i++) {
@@ -106,10 +108,9 @@ class App extends Component {
       return tasks;
     }
 
-    tasks = orderTasks(tasks);
     return (
       <div className="App">
-        <Gantt tasks={ tasks } />
+        <Gantt tasks={ orderTasks(tasks) } />
       </div>
     );
   }

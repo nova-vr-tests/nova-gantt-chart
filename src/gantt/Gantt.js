@@ -31,7 +31,7 @@ class Gantt extends Component {
     this.constants.CALENDAR_ARROW_HEIGHT = 2 * this.constants.BASE_HEIGHT;
     this.constants.TASK_TITLE_START = 20;
     this.constants.SUBTASK_TITLE_START = 40;
-    this.constants.DATE_GRADUATION_START = 200;     // where date graduation starts
+    this.constants.DATE_GRADUATION_START = 250;     // where date graduation starts
     this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT;
     this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER * 0.75;
     this.constants.CALENDAR_GRADUATION_START = 10;
@@ -80,7 +80,7 @@ class Gantt extends Component {
     this.constants.TEXT_COLOR_OPACITY = new paper.Color(255, 255, 255, this.constants.TEXT_OPACITY);
     this.constants.TEXT_COLOR = 'white';
     this.constants.DATE_GRADUATION_Y_COORD = this.constants.CALENDAR_ARROW_HEIGHT / 2 * 0.75;
-    this.constants.CALENDAR_POINTS_BEFORE_START = 7;
+    this.constants.CALENDAR_POINTS_BEFORE_START = 10;
     this.constants.CALENDAR_POINTS_AFTER_END = 2;
     this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8;
     this.constants.CALENDAR_MONTH_FONT_SIZE = 12;
@@ -95,6 +95,7 @@ class Gantt extends Component {
     this.drawTaskArrowPoints = this.drawTaskArrowPoints.bind(this);
     this.drawTaskLine = this.drawTaskLine.bind(this);
     this.drawTaskTitle = this.drawTaskTitle.bind(this);
+    this.exportGanttToSVG = this.exportGanttToSVG.bind(this);
     this.setupCanvas = this.setupCanvas.bind(this);
   }
 
@@ -146,6 +147,12 @@ class Gantt extends Component {
 
     yCoord += this.constants.BASE_HEIGHT * 2;
     this.drawCalendarLine(tasks[0].startDate, tasks[tasks.length - 1].endDate, yCoord);
+
+    this.exportGanttToSVG();
+  }
+
+  exportGanttToSVG() {
+    console.log(paper.project.exportSVG());
   }
 
   /**
@@ -154,7 +161,6 @@ class Gantt extends Component {
    * @returns {number} X-coordinate of input date to return
    */
   dateToXCoord(date) {
-    console.log(date)
     const xcoord = diffInDays(this.constants.START_DATE, date) * this.constants.BASE_WIDTH + this.constants.DATE_GRADUATION_START;
 
     return xcoord;

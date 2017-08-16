@@ -71,7 +71,7 @@ class Gantt extends Component {
 
 
     // Date constants
-    this.constants.START_DATE = new Date('01/01/17');
+    this.constants.START_DATE = new Date(this.props.tasks[0].startDate);
 
     // Other constants
     this.constants.FIRST_TASK_Y = 50;
@@ -153,7 +153,8 @@ class Gantt extends Component {
    * @returns {number} X-coordinate of input date to return
    */
   dateToXCoord(date) {
-    const xcoord = diffInDays(this.props.tasks[0].startDate, date) * this.constants.BASE_WIDTH + this.constants.DATE_GRADUATION_START;
+    console.log(date)
+    const xcoord = diffInDays(this.constants.START_DATE, date) * this.constants.BASE_WIDTH + this.constants.DATE_GRADUATION_START;
 
     return xcoord;
   }
@@ -281,7 +282,6 @@ class Gantt extends Component {
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
     text.content = title;
     text.fontSize = FONT_SIZE;
-    console.log(text.bounds)
     const arrowEndPoint = this.drawArrow(ARROW_START, ARROW_START + text.bounds.right - text.bounds.left + ARROW_HEIGHT / 2 + TIP_LENGTH, yCoord, taskType, color, false);
     const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
     circle.fillColor = color;

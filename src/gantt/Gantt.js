@@ -497,7 +497,7 @@ class Gantt extends Component {
     const drawLogo = () => {
       const logo = new paper.Path.Circle(
         new paper.Point(this.constants.TASK_TITLE_START + this.constants.CALENDAR_ARROW_HEIGHT / 2, yCoord),
-        this.constants.CALENDAR_ARROW_HEIGHT / 3,
+        this.constants.TASK_ARROW_HEIGHT / 2,
       );
       logo.fillColor = 'black';
       logo.opacity = this.constants.TEXT_OPACITY;

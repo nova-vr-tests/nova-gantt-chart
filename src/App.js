@@ -63,13 +63,13 @@ class App extends Component {
       },
       {
         title: "Training",
-        startDate: week(3),
+        startDate: week(2),
         endDate: week(15),
         color: '#6b71b4',
         subtasks: [
           {
             title: 'Getting started',
-            startDate: week(3),
+            startDate: week(2),
             endDate: week(5),
           },
           {

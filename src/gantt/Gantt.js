@@ -318,16 +318,14 @@ class Gantt extends Component {
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(startDate, 1).getDate();
-        text.fillColor = 'white';
-        text.opacity = 0.5;
+        text.fillColor = this.constants.TEXT_COLOR;
       } else if (i === numPoints + 1) {
         const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = addDays(endDate, -1).getDate();
-        text.fillColor = 'white';
-        text.opacity = 0.5;
+        text.fillColor = this.constants.TEXT_COLOR;
       } else {
         points[i] = new paper.Path.Circle(
           new paper.Point(this.dateToXCoord(startDate) + i * 7 * this.constants.BASE_WIDTH + this.constants.TASK_ARROW_HEIGHT / 2, yCoord),
@@ -379,7 +377,7 @@ class Gantt extends Component {
         if(i === i_0) {
           year = new paper.PointText(new paper.Point(
             x,
-            yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_YEAR_FONT_SIZE / 2,
+            yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_YEAR_FONT_SIZE / 2.5,
           ));
 
           year.fontSize = this.constants.CALENDAR_YEAR_FONT_SIZE;
@@ -436,7 +434,7 @@ class Gantt extends Component {
 
       // Show first month
       for(let i = 0; i < monthGraduation.length + 1; i++) {
-        months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
+        months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2.5 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
         months[i].content = monthsNames[i % 12 ? i % 12 - 1: 11];
 
         if(i === 0) {

@@ -398,9 +398,6 @@ class Gantt extends Component {
 
           points[i].fillColor = 'black';
           points[i].opacity = this.constants.TEXT_OPACITY;
-
-          if(i === 0)
-            points[i].fillColor = 'red';
         } else {
           mondays[m] = new paper.PointText(new paper.Point(x - this.constants.CALENDAR_GRADUATION_FONT_SIZE / 1.5, yCoord));
           mondays[m].content = (date_m.getDate() + '').length < 2 ? "0" + date_m.getDate() : date_m.getDate();

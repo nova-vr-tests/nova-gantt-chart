@@ -164,7 +164,7 @@ class Gantt extends Component {
       {
         title: "Task 4",
         startDate: new Date('01/18/17'),
-        endDate: new Date('04/31/17'),
+        endDate: new Date('04/15/17'),
         color: '#5888B3',
         subtasks: [
           {
@@ -496,13 +496,13 @@ class Gantt extends Component {
 
     const drawMonths = () => {
       const monthsNames = [
-        "January", "Febuary", "March", "May", "April", "June", "July", "August", "Septembre", "October", "November", "December",
-      ]
+        "January", "Febuary", "March", "April", "May", "June", "July", "August", "Septembre", "October", "November", "December",
+      ];
 
       // Show first month
       for(let i = 0; i < monthGraduation.length + 1; i++) {
         months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
-        months[i].content = monthsNames[i];
+        months[i].content = monthsNames[i % 12 ? i % 12 - 1: 11];
 
         if(i === 0) {
           if(months[i].bounds.right < monthGraduation[0].bounds.left) {
@@ -513,7 +513,7 @@ class Gantt extends Component {
             months[i].opacity = 0;
           }
         } else if(i === monthGraduation.length) {
-          if(months[i].bounds.left > monthGraduation[i - 1].bounds.right) {
+          if(this.dateToXCoord(endDate) - (months[i].bounds.right - months[i].bounds.left) / 2 > monthGraduation[i - 1].bounds.right) {
             months[i].fillColor = 'black';
             months[i].opacity = 0.5;
             months[i].strokeWidth = 1;

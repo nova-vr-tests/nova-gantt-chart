@@ -164,7 +164,7 @@ class Gantt extends Component {
       {
         title: "Task 4",
         startDate: new Date('01/18/17'),
-        endDate: new Date('01/31/17'),
+        endDate: new Date('04/31/17'),
         color: '#5888B3',
         subtasks: [
           {
@@ -424,11 +424,12 @@ class Gantt extends Component {
   drawCalendarLine(startDate, endDate, yCoord) {
     this.drawArrow(this.constants.TASK_TITLE_START, this.dateToXCoord(endDate) + 4 * this.constants.BASE_WIDTH, yCoord, this.constants.CALENDAR, this.constants.CALENDAR_BG_COLOR);
 
-    const drawCalendarGraduation = () => {
       const points = [];
       const mondays = [];
       const monthGraduation = [];
       let year;
+      const months = [];
+    const drawCalendarGraduation = () => {
 
       const deltaDays = diffInDays(startDate, endDate);
       const pointYCoord = yCoord - this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.DATE_GRADUATION_Y_COORD;
@@ -452,6 +453,7 @@ class Gantt extends Component {
           year.fillColor = new paper.Color(0,0,0,0.5);
           year.strokeWidth = 1;
           year.content = date_m.getFullYear();
+
         }
 
         // Show point of not Monday
@@ -483,13 +485,63 @@ class Gantt extends Component {
           monthGraduation[j].strokeWidth = 3;
           monthGraduation[j].opacity = this.constants.TEXT_OPACITY;
           monthGraduation[j].strokeCap = 'round';
+
+          j++;
         }
 
         addDays(date_m, 1);
+      };
+
+    };
+
+    const drawMonths = () => {
+      const monthsNames = [
+        "January", "Febuary", "March", "May", "April", "June", "July", "August", "Septembre", "October", "November", "December",
+      ]
+
+      // Show first month
+      for(let i = 0; i < monthGraduation.length + 1; i++) {
+        months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
+        months[i].content = monthsNames[i];
+
+        if(i === 0) {
+          if(months[i].bounds.right < monthGraduation[0].bounds.left) {
+            months[i].fillColor = 'black';
+            months[i].opacity = 0.5;
+            months[i].strokeWidth = 1;
+          } else {
+            months[i].opacity = 0;
+          }
+        } else if(i === monthGraduation.length) {
+          if(months[i].bounds.left > monthGraduation[i - 1].bounds.right) {
+            months[i].fillColor = 'black';
+            months[i].opacity = 0.5;
+            months[i].strokeWidth = 1;
+            const translateX = this.dateToXCoord(endDate) -  months[i].bounds.left;
+            months[i].translate(new paper.Point(translateX, 0));
+          } else {
+            months[i].opacity = 0;
+          }
+
+        } else {
+          // center month
+          months[i].fillColor = 'black';
+          months[i].opacity = 0.5;
+          months[i].strokeWidth = 1;
+
+          const delta_0 = 0;//(monthGraduation[0].bounds.left - months[i].bounds.right) / 2;
+          const translateX = i * (monthGraduation[i].bounds.left - monthGraduation[i - 1].bounds.right + delta_0)  - this.dateToXCoord(startDate);
+
+          const midPt = (months[i].bounds.right - months[i].bounds.left) / 2;
+          const midPt_prime = monthGraduation[i - 1].bounds.left + (monthGraduation[i].bounds.left - monthGraduation[i - 1].bounds.right) / 2 - months[0].bounds.left;
+          const delta = midPt_prime - midPt;
+          months[i].translate(new paper.Point(delta, 0));
+        }
       }
     }
 
     drawCalendarGraduation();
+    drawMonths();
   }
 
   render() {

@@ -8,66 +8,66 @@ class App extends Component {
   render() {
     const tasks = [
       {
-        title: "Task 1",
+        title: "Hardware install",
         startDate: new Date('01/05/17'),
         endDate: new Date('01/18/17'),
         color: '#65B766',
         subtasks: [
           {
-            title: "Subtask 1.1",
+            title: "Setch design",
             startDate: new Date('01/05/17'),
             endDate: new Date('01/09/17'),
           },
           {
-            title: "Subtask 1.2",
+            title: "Intro tech restrictions",
             startDate: new Date('01/09/17'),
             endDate: new Date('01/18/17'),
           }
         ]
       },
       {
-        title: "Task 2",
+        title: "Define expectation",
         startDate: new Date('01/18/17'),
         endDate: new Date('01/31/17'),
         color: '#59AF92',
         subtasks: [
           {
-            title: "Subtask 2.1",
+            title: "Sketch design",
             startDate: new Date('01/18/17'),
             endDate: new Date('01/25/17'),
           },
           {
-            title: "Subtask 2.2",
+            title: "Intro tech restrictions",
             startDate: new Date('01/25/17'),
             endDate: new Date('01/31/17'),
           }
         ]
       },
       {
-        title: "Task 3",
+        title: "Exp BGRS tour",
         startDate: new Date('01/18/17'),
         endDate: new Date('02/08/17'),
         color: '#59A4AF',
         subtasks: []
       },
       {
-        title: "Task 4",
+        title: "Hard Mop creative",
         startDate: new Date('01/18/17'),
-        endDate: new Date('04/19/17'),
+        endDate: new Date('03/19/17'),
         color: '#5888B3',
         subtasks: [
           {
-            title: "Subtask 2.1",
+            title: "Sketch design",
             startDate: new Date('01/18/17'),
             endDate: new Date('01/25/17'),
           },
           {
-            title: "Subtask 2.2",
+            title: "Intro tech restrictions",
             startDate: new Date('01/25/17'),
             endDate: new Date('01/31/17'),
           },
           {
-            title: "Subtask 2.3",
+            title: "Gameplay",
             startDate: new Date('01/20/17'),
             endDate: new Date('01/28/17'),
           }

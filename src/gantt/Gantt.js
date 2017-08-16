@@ -35,6 +35,7 @@ class Gantt extends Component {
     this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT;
     this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER * 0.75;
     this.constants.CALENDAR_GRADUATION_START = 10;
+    this.constants.SUBTASK_COLOR_OPACITY = 0.6;
 
     // Colors
     this.constants.CALENDAR_BG_COLOR = '#CCCABC';
@@ -172,7 +173,7 @@ class Gantt extends Component {
     } else if (taskType === this.constants.SUBTASK) {
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
       tipAnchorLength = 0.5 * this.constants.BASE_WIDTH;
-      opacity = 0.5;
+      opacity = this.constants.SUBTASK_COLOR_OPACITY;
     } else if (taskType === this.constants.CALENDAR) {
       ARROW_HEIGHT = this.constants.CALENDAR_ARROW_HEIGHT;
       tipAnchorLength = 1.0 * this.constants.BASE_WIDTH;
@@ -351,6 +352,8 @@ class Gantt extends Component {
   }
 
   drawSubtaskLine(subtaskName, startDate, endDate, yCoord, color) {
+    color = new paper.Color(color)
+    color.alpha = this.constants.SUBTASK_COLOR_OPACITY;
     this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK, color);
     const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK, color);
     this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord);

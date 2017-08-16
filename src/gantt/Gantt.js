@@ -33,7 +33,7 @@ class Gantt extends Component {
     this.constants.SUBTASK_TITLE_START = 40;
     this.constants.DATE_GRADUATION_START = 200;     // where date graduation starts
     this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT;
-    this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER;
+    this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER * 0.75;
     this.constants.CALENDAR_GRADUATION_START = 10;
 
     // Colors
@@ -386,6 +386,7 @@ class Gantt extends Component {
           year.fillColor = new paper.Color(0,0,0,0.5);
           year.strokeWidth = 1;
           year.content = date_m.getFullYear();
+          year.translate(new paper.Point(-(year.bounds.right - year.bounds.left), 0));
 
         }
 
@@ -451,7 +452,7 @@ class Gantt extends Component {
             months[i].fillColor = 'black';
             months[i].opacity = 0.5;
             months[i].strokeWidth = 1;
-            const translateX = this.dateToXCoord(endDate) -  months[i].bounds.left;
+            const translateX = this.dateToXCoord(endDate) -  months[i].bounds.right;
             months[i].translate(new paper.Point(translateX, 0));
           } else {
             months[i].opacity = 0;

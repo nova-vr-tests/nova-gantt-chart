@@ -53,7 +53,7 @@ class App extends Component {
       {
         title: "Task 4",
         startDate: new Date('01/18/17'),
-        endDate: new Date('04/15/17'),
+        endDate: new Date('04/19/17'),
         color: '#5888B3',
         subtasks: [
           {

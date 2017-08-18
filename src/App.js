@@ -5,11 +5,20 @@ import './App.css';
 import Gantt from './gantt/Gantt';
 
 class App extends Component {
-  render() {
-    const initDate = () => new Date('09/01/17');
-    const week = weeks => new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
+  constructor(props) {
+    super(props);
 
-    const tasks = [
+    this.state = {
+      initDate: '09/17/2018',
+      getInitDate : () => new Date(this.state.initDate),
+    }
+    
+
+    this.orderTasks = this.orderTasks.bind(this);
+    this.weeksToDate = this.weeksToDate.bind(this);
+
+    const week = this.weeksToDate;
+    this.state.tasks = [
       {
         title: "Hardware install",
         startDate: week(0),
@@ -102,22 +111,33 @@ class App extends Component {
         color: '#926cad',
       }
     ];
+  }
 
-    const orderTasks = tasks_original => {
-      const tasks = [...tasks_original];
+  orderTasks(tasks_original) {
+    const tasks = [...tasks_original];
 
-      tasks.sort((a, b) => a.startDate - b.startDate);
+    tasks.sort((a, b) => a.startDate - b.startDate);
 
-      for(let i = 0; i < tasks.length; i++) {
-        tasks[i].subtasks.sort((a, b) => a.startDate - b.startDate);
-      }
-
-      return tasks;
+    for(let i = 0; i < tasks.length; i++) {
+      tasks[i].subtasks.sort((a, b) => a.startDate - b.startDate);
     }
 
+    return tasks;
+  }
+
+  weeksToDate(weeks) {
+    const initDate = this.state.getInitDate;
+    return new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
+  }
+
+  getForm() {
+    
+  }
+
+  render() {
     return (
       <div className="App">
-        <Gantt tasks={ orderTasks(tasks) } />
+        <Gantt tasks={ this.orderTasks(this.state.tasks) } />
       </div>
     );
   }

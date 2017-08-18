@@ -23,7 +23,7 @@ class Gantt extends Component {
     this.constants = {};
     // Base dimensions
     this.constants.BASE_HEIGHT = 19;                // task arrow height
-    this.constants.BASE_WIDTH = 12;                 // x-coord difference between 2 days 
+    this.constants.BASE_WIDTH = 10;                 // x-coord difference between 2 days 
 
     // Arrow dimensions
     this.constants.TASK_ARROW_HEIGHT = 1.5 * this.constants.BASE_HEIGHT;

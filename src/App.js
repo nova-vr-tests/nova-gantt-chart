@@ -16,6 +16,8 @@ class App extends Component {
 
     this.orderTasks = this.orderTasks.bind(this);
     this.weeksToDate = this.weeksToDate.bind(this);
+    this.getForm = this.getForm.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
 
     const week = this.weeksToDate;
     this.state.tasks = [
@@ -130,13 +132,59 @@ class App extends Component {
     return new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
   }
 
+  handleInputChange(event, i, j = null) {
+    const target = event.target;
+
+    const tasks = [...this.state.tasks ];
+    if(j)
+      tasks[i][j].title = target.value;
+    else
+      tasks[i].title = target.value;
+
+     this.setState({
+      tasks,
+    });
+  }
+
   getForm() {
-    
+    const taskLines = [];
+
+    for(let i = 0; i < this.state.tasks.length; i++) {
+      const task = this.state.tasks[i];
+      const subtaskLlines = [];
+
+      for(let j = 0; j < task.subtasks.length; j++) {
+        subtaskLlines[j] = <input type="text" key={ j } value={ task.subtasks[j].title } onChange={ e => this.handleInputChange(e, i, j) } className="subtask-title--input" />;
+      }
+
+      taskLines[i] = (
+        <div className="task-line--wrapper">
+          <input type="text" key={ i } value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
+          <div className="subtask-lines--wrapper">
+            { subtaskLlines }
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div>
+        { taskLines }
+      </div>
+   ) 
   }
 
   render() {
+    const styles = {
+      main: {
+        display: 'flex',
+        flexDirection: 'row',
+      },
+    };
+
     return (
-      <div className="App">
+      <div className="App" style={ styles.main }>
+        { this.getForm() }
         <Gantt tasks={ this.orderTasks(this.state.tasks) } />
       </div>
     );

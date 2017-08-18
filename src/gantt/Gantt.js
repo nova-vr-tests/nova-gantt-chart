@@ -22,8 +22,8 @@ class Gantt extends Component {
     // Constant used to build chart elements
     this.constants = {};
     // Base dimensions
-    this.constants.BASE_HEIGHT = 12;                // task arrow height
-    this.constants.BASE_WIDTH = 14;                 // x-coord difference between 2 days 
+    this.constants.BASE_HEIGHT = 19;                // task arrow height
+    this.constants.BASE_WIDTH = 12;                 // x-coord difference between 2 days 
 
     // Arrow dimensions
     this.constants.TASK_ARROW_HEIGHT = 1.5 * this.constants.BASE_HEIGHT;
@@ -283,13 +283,13 @@ class Gantt extends Component {
       ARROW_START = this.constants.TASK_TITLE_START;
       TEXT_START = this.constants.TASK_TITLE_START_OFFSET;
       FONT_SIZE = this.constants.TASK_FONT_SIZE;
-      TIP_LENGTH = 35;
+      TIP_LENGTH = 45;
     } else {
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
       ARROW_START = this.constants.SUBTASK_TITLE_START;
       TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
       FONT_SIZE = this.constants.SUBTASK_FONT_SIZE;
-      TIP_LENGTH = 25;
+      TIP_LENGTH = 35;
     }
 
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
@@ -337,7 +337,7 @@ class Gantt extends Component {
         text.content = (addDays(startDate, 1).getDate() + '').length < 2 ? '0' + startDate.getDate() : startDate.getDate();
         text.fillColor = this.constants.TEXT_COLOR;
       } else if (i === numPoints) {
-        const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2 - 3, yCoord + 4));
+        const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2 - 8, yCoord + 4));
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;

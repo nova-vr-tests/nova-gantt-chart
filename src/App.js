@@ -45,7 +45,7 @@ class App extends Component {
       {
         title: "Design spec",
         startDate: week(3),
-        endDate: week(14),
+        endDate: week(15),
         color: '#5888B3',
         subtasks: [
           {

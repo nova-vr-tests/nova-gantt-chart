@@ -538,8 +538,8 @@ class Gantt extends Component {
     // Calendar arrow defines SVG's furthest coordinates
     // We use this to infer the SVG framing
     const svgSize = {
-      x: endPoint.x,
-      y: year.bounds.bottom,
+      x: endPoint.x + this.constants.TASK_TITLE_START,
+      y: year.bounds.bottom + this.constants.TASK_TITLE_START,
     };
 
     return svgSize;

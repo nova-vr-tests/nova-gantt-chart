@@ -108,36 +108,43 @@ test('orders tasks', () => {
       {
         title: "Training",
         startDate: week(2),
-        endDate: week(14),
+        endDate: week(9),
         color: '#6b71b4',
         subtasks: [
           {
             title: 'Getting started',
             startDate: week(2),
-            endDate: week(4),
+            endDate: week(9),
           },
           {
             title: 'Hardware',
-            startDate: week(4),
+            startDate: week(2),
             endDate: week(7),
-          },
-          {
-            title: 'Software',
-            startDate: week(7),
-            endDate: week(10),
-          },
-          {
-            title: 'Theory',
-            startDate: week(10),
-            endDate: week(13),
-          },
-          {
-            title: 'Lab',
-            startDate: week(13),
-            endDate: week(14),
           },
         ]
       },
     ];
-    expect(1 + 2).toBe(3);
+
+    const tasks3_answer = [
+      {
+        title: "Training",
+        startDate: week(2),
+        endDate: week(9),
+        color: '#6b71b4',
+        subtasks: [
+          {
+            title: 'Hardware',
+            startDate: week(2),
+            endDate: week(7),
+          },
+          {
+            title: 'Getting started',
+            startDate: week(2),
+            endDate: week(9),
+          },
+        ]
+      },
+    ];
+
+    expect(JSON.stringify(orderTasks(tasks3))).toBe(JSON.stringify(tasks3_answer));
 });

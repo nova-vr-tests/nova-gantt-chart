@@ -1,3 +1,6 @@
+/**
+ * https://stackoverflow.com/questions/21012580/is-it-possible-to-write-data-to-file-using-only-javascript 
+ */
 function download(strData, strFileName, strMimeType) {
   var D = document,
     A = arguments,
@@ -8,13 +11,6 @@ function download(strData, strFileName, strMimeType) {
 
   //build download link:
   a.href = "data:" + strMimeType + "charset=utf-8," + escape(strData);
-
-
-  // if (window.MSBlobBuilder) { // IE10
-  //   var bb = new MSBlobBuilder();
-  //   bb.append(strData);
-  //   return navigator.msSaveBlob(bb, strFileName);
-  // } /* end if(window.MSBlobBuilder) */
 
 
 
@@ -47,19 +43,6 @@ function download(strData, strFileName, strMimeType) {
 const orderTasks = tasks_original=> {
   const tasks = [...tasks_original];
 
-  // Sort by arrow length first
-
-  // Sort by task date
-  tasks.sort((a, b) => a.startDate - b.startDate);
-
-  // Sort by subtask length and date
-  for(let i = 0; i < tasks.length; i++) {
-    // Sort by length first
-
-    // Sort by date
-    tasks[i].subtasks.sort((a, b) => a.startDate - b.startDate);
-  }
-
   // Update task delta t when subtasks
     for(let i = 0; i < tasks.length; i++) {
       const task = tasks[i];
@@ -85,10 +68,26 @@ const orderTasks = tasks_original=> {
       task.endDate = maxDate;
     }
 
-  // Sort by task date again
-  tasks.sort((a, b) => a.startDate - b.startDate);
+  // Sort by task date
+  tasks.sort((a, b) => {
+    if(JSON.stringify(a.startDate) !== JSON.stringify(b.startDate)) {
+      return a.startDate - b.startDate
+    } else {
+      return (a.endDate - a.startDate) - (b.endDate - b.startDate);
+    }
+  });
 
-  // Update init date
+  // Sort by subtask length and date
+  for(let i = 0; i < tasks.length; i++) {
+    // Sort by date
+    tasks[i].subtasks.sort((a, b) => {
+      if(JSON.stringify(a.startDate) !== JSON.stringify(b.startDate)) {
+        return a.startDate - b.startDate
+      } else {
+        return (a.endDate - a.startDate) - (b.endDate - b.startDate);
+      }
+    });
+  }
 
   return tasks;
 };

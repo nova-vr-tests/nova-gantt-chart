@@ -191,17 +191,23 @@ class App extends Component {
           <div className="subtask-line--wrapper" key={ "subtask-" + i + "-" + j }>
             <input type="text"  value={ subtask.title } onChange={ e => this.handleInputChange(e, i, j) } className="subtask-title--input" />
             {/* <input type="date" value={ convertDateToString(subtask.startDate) } onChange={ e => this.handleInputChange(e, i, j) } /> */}
-            <Datepicker selected={ moment(convertDateToString(subtask.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "startDate") } />
-            <Datepicker selected={ moment(convertDateToString(subtask.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "endDate") } />
+            <div className="date-pickers">
+              <Datepicker selected={ moment(convertDateToString(subtask.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "startDate") } />
+              <Datepicker selected={ moment(convertDateToString(subtask.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "endDate") } />
+            </div>
           </div>
         );
       }
 
       taskLines[i] = (
         <div className="task-line--wrapper" key={ "task-" + i }>
-          <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
-          <Datepicker selected={ moment(convertDateToString(task.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "startDate") } />
-          <Datepicker selected={ moment(convertDateToString(task.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "endDate") } />
+          <div className="task-line--wrapper2">
+            <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
+            <div className="date-pickers">
+              <Datepicker selected={ moment(convertDateToString(task.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "startDate") } />
+              <Datepicker selected={ moment(convertDateToString(task.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "endDate") } />
+            </div>
+          </div>
           <div className="subtask-lines--wrapper">
             { subtaskLlines }
           </div>

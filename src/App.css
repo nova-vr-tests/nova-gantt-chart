@@ -2,8 +2,61 @@
   text-align: center;
 }
 
+
+.date-pickers {
+  display: flex;
+  margin: 0.5rem 0rem;
+}
+
+.date-pickers > div {
+  display: flex;
+  justify-content: center;
+}
+
+.date-pickers input {
+  text-align: center;
+  width: 7rem;
+}
+
 .subtask-lines--wrapper {
   margin-left: 3rem;
+}
+
+.task-line--wrapper, .subtask-line--wrapper{
+  display: flex;
+  flex-direction: column;
+}
+
+.task-line--wrapper {
+  margin: 2rem 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: white;
+  border-radius: 1rem;
+}
+
+.task-line--wrapper2 {
+  display: flex;
+}
+
+.subtask-line--wrapper {
+  margin: 0.25rem 0rem;
+  flex-direction: row;
+}
+
+
+.task-title--input {
+  font-size: 1.25rem;
+}
+
+.subtask-title--input {
+  font-size: 1rem;
+}
+
+input {
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  color: rgba(0, 0, 0, 0.7);
 }
 
 @keyframes App-logo-spin {

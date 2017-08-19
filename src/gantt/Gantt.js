@@ -171,7 +171,11 @@ class Gantt extends Component {
     }
 
     yCoord += this.constants.BASE_HEIGHT * 2;
-    const svgSize = this.drawCalendarLine(tasks[0].startDate, tasks[tasks.length - 1].endDate, yCoord);
+
+    // get furthest date in tasks
+    const calendarEndDate = tasks.map(t => t.endDate).sort((a, b) => a- b).reverse()[0];
+    console.log(calendarEndDate)
+    const svgSize = this.drawCalendarLine(tasks[0].startDate, calendarEndDate, yCoord);
 
     paper.view.viewSize.width = svgSize.x;
     paper.view.viewSize.height = svgSize.y;

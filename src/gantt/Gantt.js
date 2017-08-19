@@ -465,8 +465,6 @@ class Gantt extends Component {
 
         addDays(date_m, 1);
       };
-
-
     };
 
     const drawMonths = () => {

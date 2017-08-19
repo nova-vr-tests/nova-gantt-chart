@@ -190,8 +190,17 @@ class App extends Component {
 
   }
 
-  addSubtask() {
-
+  addSubtask(i) {
+    const tasks = [...this.state.tasks];
+    const subtasks = tasks[i].subtasks;
+    subtasks.push({
+      title: 'new subtask',
+      startDate: this.state.tasks[i].startDate,
+      endDate: new Date(new Date(tasks[i].startDate).setDate(tasks[i].startDate.getDate() + 7)),
+    })
+    this.setState({
+      tasks,
+    })
   }
 
   removeSubtask() {
@@ -243,7 +252,7 @@ class App extends Component {
             </div>
             <div className="subtask-lines--wrapper">
               { subtaskLlines }
-              <div className="add-subtask--button">Add Subtask</div>
+              <div className="add-subtask--button" onClick={ () => this.addSubtask(i) }>Add Subtask</div>
             </div>
           </div>
         </div>

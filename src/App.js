@@ -3,6 +3,9 @@ import logo from './logo.svg';
 import './App.css';
 
 import Gantt from './gantt/Gantt';
+import moment from 'moment';
+import Datepicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 class App extends Component {
   constructor(props) {
@@ -132,32 +135,39 @@ class App extends Component {
     return new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
   }
 
-  handleInputChange(event, i, j = -1) {
+  handleInputChange(event, i, j = -1, date="startDate") {
     const target = event.target;
-    console.log(event.target, "aaa", target.type)
-    const type = target.type
+    console.log(event)
+
+    const convertMomentToDate = moment => {
+      const y = moment.year();
+      const m = moment.month();
+      const d = moment.date();
+
+      return new Date(y + "/" + (m + 1)  + "/" + d);
+    }
+    console.log(convertMomentToDate, convertMomentToDate(event));
 
     const tasks = [...this.state.tasks ];
 
-    if(type === "text") {
+    if(target) {
       if(j > -1) {
         tasks[i].subtasks[j].title = target.value;
       } else {
         tasks[i].title = target.value;
       }
-    } else if(type === "date") {
-      console.log(target.value, new Date(target.value), "=======");
+    } else {
       if(j > -1) {
-        tasks[i].subtasks[j].startDate = new Date(target.value);
-        console.log(tasks[i].subtasks[j].startDate);
+        tasks[i].subtasks[j][date] = convertMomentToDate(event);
       } else {
-        tasks[i].title = new Date(target.value);
+        tasks[i][date] = convertMomentToDate(event);
       }
     }
 
      this.setState({
       tasks: this.orderTasks(tasks),
     });
+    console.log(this.state.tasks)
   }
 
   getForm() {
@@ -166,8 +176,9 @@ class App extends Component {
     const convertDateToString = date => {
       let y = date.getFullYear();
       let m = date.getMonth() > 8 ? date.getMonth() + 1 : "0" + (date.getMonth() + 1);
-      let d = date.getDate() > 9 ? date.getDate() + 1 : "0" + date.getDate();
+      let d = date.getDate() > 9 ? date.getDate() : "0" + date.getDate();
 
+      console.log(y + "-" + m + "-" + d);
       return y + "-" + m + "-" + d;
     };
 
@@ -181,7 +192,9 @@ class App extends Component {
         subtaskLlines[j] = (
           <div className="subtask-line--wrapper" key={ "subtask-" + i + "-" + j }>
             <input type="text"  value={ subtask.title } onChange={ e => this.handleInputChange(e, i, j) } className="subtask-title--input" />
-            <input type="date" value={ convertDateToString(subtask.startDate) } onChange={ e => this.handleInputChange(e, i, j) } />
+            {/* <input type="date" value={ convertDateToString(subtask.startDate) } onChange={ e => this.handleInputChange(e, i, j) } /> */}
+            <Datepicker selected={ moment(convertDateToString(subtask.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "startDate") } />
+            <Datepicker selected={ moment(convertDateToString(subtask.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "endDate") } />
           </div>
         );
       }
@@ -189,6 +202,8 @@ class App extends Component {
       taskLines[i] = (
         <div className="task-line--wrapper" key={ "task-" + i }>
           <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
+          <Datepicker selected={ moment(convertDateToString(task.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "startDate") } />
+          <Datepicker selected={ moment(convertDateToString(task.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "endDate") } />
           <div className="subtask-lines--wrapper">
             { subtaskLlines }
           </div>

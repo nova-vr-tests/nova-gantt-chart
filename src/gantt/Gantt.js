@@ -84,7 +84,7 @@ class Gantt extends Component {
     this.constants.TEXT_COLOR = 'white';
     this.constants.DATE_GRADUATION_Y_COORD = this.constants.CALENDAR_ARROW_HEIGHT / 2 * 0.75;
     this.constants.CALENDAR_POINTS_BEFORE_START = 10;
-    this.constants.CALENDAR_POINTS_AFTER_END = 2;
+    this.constants.CALENDAR_POINTS_AFTER_END = 0;
     this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8;
     this.constants.CALENDAR_MONTH_FONT_SIZE = 12;
     this.constants.CALENDAR_YEAR_FONT_SIZE = 18;

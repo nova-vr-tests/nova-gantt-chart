@@ -194,22 +194,27 @@ class App extends Component {
             <div className="date-pickers">
               <Datepicker selected={ moment(convertDateToString(subtask.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "startDate") } />
               <Datepicker selected={ moment(convertDateToString(subtask.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "endDate") } />
+              <div className="remove-subtask--button">Remove</div>
             </div>
           </div>
         );
       }
 
       taskLines[i] = (
-        <div className="task-line--wrapper" key={ "task-" + i }>
-          <div className="task-line--wrapper2">
-            <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
-            <div className="date-pickers">
-              <Datepicker selected={ moment(convertDateToString(task.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "startDate") } />
-              <Datepicker selected={ moment(convertDateToString(task.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "endDate") } />
+        <div className="task-controls--wrapper">
+          <div className="task-line--wrapper" key={ "task-" + i }>
+            <div className="task-line--wrapper2">
+              <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
+              <div className="date-pickers">
+                <Datepicker selected={ moment(convertDateToString(task.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "startDate") } />
+                <Datepicker selected={ moment(convertDateToString(task.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "endDate") } />
+                <div className="remove-task--button">Remove</div>
+              </div>
             </div>
-          </div>
-          <div className="subtask-lines--wrapper">
-            { subtaskLlines }
+            <div className="subtask-lines--wrapper">
+              { subtaskLlines }
+              <div className="add-subtask--button">Add Subtask</div>
+            </div>
           </div>
         </div>
       )
@@ -218,6 +223,7 @@ class App extends Component {
     return (
       <div>
         { taskLines }
+        <div className="add-task--button">Add Task</div>
       </div>
    ) 
   }

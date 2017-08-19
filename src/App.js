@@ -253,10 +253,20 @@ class App extends Component {
         );
       }
 
+      const taskLineStyle = {
+        wrapper: {
+          border: '4px solid',
+          borderColor: this.state.tasks[i].color,
+        },
+        color: {
+          color: this.state.tasks[i].color,
+        }
+      };
+
       taskLines[i] = (
-        <div className="task-controls--wrapper">
-          <div className="color">#<input type="text" onChange={e => this.updateTaskColor(e, i)} value={ this.state.tasks[i].color } /></div>
-          <div className="task-line--wrapper" key={ "task-" + i }>
+        <div className="task-controls--wrapper" >
+          <div className="task-line--wrapper" key={ "task-" + i } style={ taskLineStyle.wrapper }>
+            <div className="color"><input type="text" onChange={e => this.updateTaskColor(e, i)} value={ this.state.tasks[i].color } style={ taskLineStyle.color } /></div>
             <div className="task-line--wrapper2">
               <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
               <div className="date-pickers">

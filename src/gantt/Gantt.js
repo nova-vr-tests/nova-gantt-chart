@@ -124,9 +124,6 @@ class Gantt extends Component {
     paper.setup(canvas);
 
     this.drawAllTasks();
-
-    // // Draw the view now:
-    // paper.view.draw();
   }
 
   drawGanttChart() {
@@ -134,9 +131,6 @@ class Gantt extends Component {
       paper.project.clear();
 
       this.drawAllTasks();
-
-      // Draw the view now:
-      // paper.view.draw();
     }
   }
 

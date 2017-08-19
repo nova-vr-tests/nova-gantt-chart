@@ -206,8 +206,19 @@ class App extends Component {
     })
   }
 
-  removeSubtask() {
+  removeSubtask(i, j) {
+    const tasks = [...this.state.tasks];
+    tasks[i].subtasks.splice(j, 1);
 
+    this.setState({ tasks, });
+
+  }
+
+  updateTaskColor(e, i) {
+    const tasks = [...this.state.tasks];
+    tasks[i].color = e.target.value;
+
+    this.setState({ tasks, });
   }
 
   getForm() {
@@ -236,7 +247,7 @@ class App extends Component {
             <div className="date-pickers">
               <Datepicker selected={ moment(convertDateToString(subtask.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "startDate") } />
               <Datepicker selected={ moment(convertDateToString(subtask.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, j, "endDate") } />
-              <div className="remove-subtask--button">Remove</div>
+              <div className="remove-subtask--button" onClick={ () => this.removeSubtask(i, j) }>Remove</div>
             </div>
           </div>
         );
@@ -244,6 +255,7 @@ class App extends Component {
 
       taskLines[i] = (
         <div className="task-controls--wrapper">
+          <div className="color">#<input type="text" onChange={e => this.updateTaskColor(e, i)} value={ this.state.tasks[i].color } /></div>
           <div className="task-line--wrapper" key={ "task-" + i }>
             <div className="task-line--wrapper2">
               <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />

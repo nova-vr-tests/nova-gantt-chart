@@ -6,6 +6,7 @@ import Gantt from './gantt/Gantt';
 import moment from 'moment';
 import Datepicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { download } from './functions';
 
 class App extends Component {
   constructor(props) {
@@ -25,6 +26,8 @@ class App extends Component {
     this.removeTask = this.removeTask.bind(this);
     this.addSubtask = this.addSubtask.bind(this);
     this.removeSubtask = this.removeSubtask.bind(this);
+    this.getSVG = this.getSVG.bind(this);
+    this.downloadSVGGantt = this.downloadSVGGantt.bind(this);
 
     const week = this.weeksToDate;
     this.state.tasks = [
@@ -290,6 +293,14 @@ class App extends Component {
    ) 
   }
 
+  getSVG(svg) {
+    this.svg = svg;
+  }
+
+  downloadSVGGantt() {
+    download(this.svg.outerHTML, 'gantt.svg', 'text/svg+xml');
+  }
+
   render() {
     const styles = {
       main: {
@@ -301,7 +312,10 @@ class App extends Component {
     return (
       <div className="App" style={ styles.main }>
         { this.getForm() }
-        <Gantt tasks={ this.orderTasks(this.state.tasks) } />
+        <div className="svg--wrapper">
+          <Gantt tasks={ this.orderTasks(this.state.tasks) } getSVG={ this.getSVG } />
+          <div className="download--button" onClick={ this.downloadSVGGantt }>Download</div>
+        </div>
       </div>
     );
   }

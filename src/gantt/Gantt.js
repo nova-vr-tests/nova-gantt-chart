@@ -90,7 +90,6 @@ class Gantt extends Component {
     this.constants.CALENDAR_YEAR_FONT_SIZE = 18;
 
     this.dateToXCoord = this.dateToXCoord.bind(this);
-    this.downloadSVGGantt = this.downloadSVGGantt.bind(this);
     this.drawAllTasks = this.drawAllTasks.bind(this);
     this.drawArrow = this.drawArrow.bind(this);
     this.drawCalendarLine = this.drawCalendarLine.bind(this);

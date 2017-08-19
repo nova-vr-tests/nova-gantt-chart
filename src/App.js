@@ -169,7 +169,6 @@ class App extends Component {
      this.setState({
       tasks: this.orderTasks(tasks),
     });
-    console.log(this.state.tasks)
   }
 
   addTask() {
@@ -229,7 +228,6 @@ class App extends Component {
       let m = date.getMonth() > 8 ? date.getMonth() + 1 : "0" + (date.getMonth() + 1);
       let d = date.getDate() > 9 ? date.getDate() : "0" + date.getDate();
 
-      console.log(y + "-" + m + "-" + d);
       return y + "-" + m + "-" + d;
     };
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Gantt.css';
+import { download } from '../functions';
 
 import paper from 'paper';
 
@@ -89,6 +90,7 @@ class Gantt extends Component {
     this.constants.CALENDAR_YEAR_FONT_SIZE = 18;
 
     this.dateToXCoord = this.dateToXCoord.bind(this);
+    this.downloadSVGGantt = this.downloadSVGGantt.bind(this);
     this.drawAllTasks = this.drawAllTasks.bind(this);
     this.drawArrow = this.drawArrow.bind(this);
     this.drawCalendarLine = this.drawCalendarLine.bind(this);
@@ -171,18 +173,21 @@ class Gantt extends Component {
     this.exportGanttToSVG();
   }
 
+  downloadSVGGantt() {
+    const svg = this.exportGanttToSVG();
+    download(svg.outerHTML, 'gantt.svg', 'text/svg+xml');
+  }
+
   exportGanttToSVG() {
     const svg = paper.project.exportSVG();
-    console.log(svg);
     
-    
-
     for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
       document.getElementsByTagName('svg')[0].remove();
 
     this.svgRange.selectNode(document.getElementById('svg'));
     this.svgRange.insertNode(svg);
 
+    return svg;
   }
 
   /**
@@ -539,7 +544,10 @@ class Gantt extends Component {
       <div className="gantt">
         <h1>Gantt</h1>
         <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'none' }}></canvas>
-        <div id="svg"></div>
+        <div className="svg--wrapper">
+          <div id="svg"></div>
+          <div className="download--button" onClick={ this.downloadSVGGantt }>Download</div>
+        </div>
       </div>
     );
   }

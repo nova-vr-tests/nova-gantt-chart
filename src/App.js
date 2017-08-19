@@ -6,7 +6,8 @@ import Gantt from './gantt/Gantt';
 import moment from 'moment';
 import Datepicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { download } from './functions';
+import { download, orderTasks } from './functions';
+
 
 class App extends Component {
   constructor(props) {
@@ -131,15 +132,7 @@ class App extends Component {
   }
 
   orderTasks(tasks_original) {
-    const tasks = [...tasks_original];
-
-    tasks.sort((a, b) => a.startDate - b.startDate);
-
-    for(let i = 0; i < tasks.length; i++) {
-      tasks[i].subtasks.sort((a, b) => a.startDate - b.startDate);
-    }
-
-    return tasks;
+    return orderTasks(tasks_original);
   }
 
   weeksToDate(weeks) {

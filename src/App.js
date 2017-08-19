@@ -21,6 +21,10 @@ class App extends Component {
     this.weeksToDate = this.weeksToDate.bind(this);
     this.getForm = this.getForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.addTask = this.addTask.bind(this);
+    this.removeTask = this.removeTask.bind(this);
+    this.addSubtask = this.addSubtask.bind(this);
+    this.removeSubtask = this.removeSubtask.bind(this);
 
     const week = this.weeksToDate;
     this.state.tasks = [
@@ -168,6 +172,32 @@ class App extends Component {
     console.log(this.state.tasks)
   }
 
+  addTask() {
+    const tasks = [...this.state.tasks];
+    tasks.push({
+      title: 'new task',
+      startDate: this.state.getInitDate(),
+      endDate: this.weeksToDate(2),
+      subtasks: [],
+      color: '#999999',
+    })
+    this.setState({
+      tasks,
+    })
+  }
+
+  removeTask() {
+
+  }
+
+  addSubtask() {
+
+  }
+
+  removeSubtask() {
+
+  }
+
   getForm() {
     const taskLines = [];
 
@@ -223,7 +253,7 @@ class App extends Component {
     return (
       <div>
         { taskLines }
-        <div className="add-task--button">Add Task</div>
+        <div className="add-task--button" onClick={ this.addTask }>Add Task</div>
       </div>
    ) 
   }

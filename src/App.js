@@ -9,7 +9,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      initDate: '09/17/2018',
+      initDate: '09/17/2017',
       getInitDate : () => new Date(this.state.initDate),
     }
     
@@ -132,34 +132,63 @@ class App extends Component {
     return new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
   }
 
-  handleInputChange(event, i, j = null) {
+  handleInputChange(event, i, j = -1) {
     const target = event.target;
+    console.log(event.target, "aaa", target.type)
+    const type = target.type
 
     const tasks = [...this.state.tasks ];
-    if(j)
-      tasks[i][j].title = target.value;
-    else
-      tasks[i].title = target.value;
+
+    if(type === "text") {
+      if(j > -1) {
+        tasks[i].subtasks[j].title = target.value;
+      } else {
+        tasks[i].title = target.value;
+      }
+    } else if(type === "date") {
+      console.log(target.value, new Date(target.value), "=======");
+      if(j > -1) {
+        tasks[i].subtasks[j].startDate = new Date(target.value);
+        console.log(tasks[i].subtasks[j].startDate);
+      } else {
+        tasks[i].title = new Date(target.value);
+      }
+    }
 
      this.setState({
-      tasks,
+      tasks: this.orderTasks(tasks),
     });
   }
 
   getForm() {
     const taskLines = [];
 
+    const convertDateToString = date => {
+      let y = date.getFullYear();
+      let m = date.getMonth() > 8 ? date.getMonth() + 1 : "0" + (date.getMonth() + 1);
+      let d = date.getDate() > 9 ? date.getDate() + 1 : "0" + date.getDate();
+
+      return y + "-" + m + "-" + d;
+    };
+
     for(let i = 0; i < this.state.tasks.length; i++) {
       const task = this.state.tasks[i];
       const subtaskLlines = [];
 
       for(let j = 0; j < task.subtasks.length; j++) {
-        subtaskLlines[j] = <input type="text" key={ j } value={ task.subtasks[j].title } onChange={ e => this.handleInputChange(e, i, j) } className="subtask-title--input" />;
+        const subtask = this.state.tasks[i].subtasks[j];
+
+        subtaskLlines[j] = (
+          <div className="subtask-line--wrapper" key={ "subtask-" + i + "-" + j }>
+            <input type="text"  value={ subtask.title } onChange={ e => this.handleInputChange(e, i, j) } className="subtask-title--input" />
+            <input type="date" value={ convertDateToString(subtask.startDate) } onChange={ e => this.handleInputChange(e, i, j) } />
+          </div>
+        );
       }
 
       taskLines[i] = (
-        <div className="task-line--wrapper">
-          <input type="text" key={ i } value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
+        <div className="task-line--wrapper" key={ "task-" + i }>
+          <input type="text" value={ task.title } onChange={ e => this.handleInputChange(e, i) } className="task-title--input" />
           <div className="subtask-lines--wrapper">
             { subtaskLlines }
           </div>

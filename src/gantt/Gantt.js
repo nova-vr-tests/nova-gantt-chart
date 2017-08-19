@@ -91,6 +91,7 @@ class Gantt extends Component {
     this.drawArrow = this.drawArrow.bind(this);
     this.drawCalendarLine = this.drawCalendarLine.bind(this);
     this.drawDashedLine = this.drawDashedLine.bind(this);
+    this.drawGanttChart = this.drawGanttChart.bind(this);
     this.drawTaskArrow = this.drawTaskArrow.bind(this);
     this.drawTaskArrowPoints = this.drawTaskArrowPoints.bind(this);
     this.drawTaskLine = this.drawTaskLine.bind(this);
@@ -101,6 +102,12 @@ class Gantt extends Component {
 
   componentDidMount() {
     this.setupCanvas();
+  }
+
+  componentWillReceiveProps() {
+    this.setState({ tasks: this.props.tasks });
+    
+    this.drawGanttChart();
   }
 
   /**
@@ -114,8 +121,19 @@ class Gantt extends Component {
 
     this.drawAllTasks();
 
-    // Draw the view now:
+    // // Draw the view now:
     paper.view.draw();
+  }
+
+  drawGanttChart() {
+    if(paper.project) {
+      paper.project.clear();
+
+      this.drawAllTasks();
+
+      // Draw the view now:
+      paper.view.draw();
+    }
   }
 
   drawAllTasks() {
@@ -509,10 +527,12 @@ class Gantt extends Component {
   }
 
   render() {
+    this.drawGanttChart();
+
     return (
       <div className="gantt">
         <h1>Gantt</h1>
-        <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'none' }}></canvas>
+        <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'block' }}></canvas>
         <div id="svg"></div>
       </div>
     );

@@ -182,7 +182,7 @@ class App extends Component {
       color: '#999999',
     })
     this.setState({
-      tasks,
+      tasks: this.orderTasks(tasks),
     })
   }
 
@@ -190,7 +190,7 @@ class App extends Component {
     const tasks = [...this.state.tasks];
     tasks.splice(i, 1);
 
-    this.setState({ tasks, });
+    this.setState({ tasks: this.orderTasks(tasks), });
   }
 
   addSubtask(i) {
@@ -202,7 +202,7 @@ class App extends Component {
       endDate: new Date(new Date(tasks[i].startDate).setDate(tasks[i].startDate.getDate() + 7)),
     })
     this.setState({
-      tasks,
+      tasks: this.orderTasks(tasks),
     })
   }
 
@@ -210,7 +210,7 @@ class App extends Component {
     const tasks = [...this.state.tasks];
     tasks[i].subtasks.splice(j, 1);
 
-    this.setState({ tasks, });
+    this.setState({ tasks: this.orderTasks(tasks), });
 
   }
 
@@ -218,7 +218,7 @@ class App extends Component {
     const tasks = [...this.state.tasks];
     tasks[i].color = e.target.value;
 
-    this.setState({ tasks, });
+    this.setState({ tasks: this.orderTasks(tasks), });
   }
 
   getForm() {
@@ -334,7 +334,7 @@ class App extends Component {
       <div className="App" style={ styles.main }>
         { this.getForm() }
         <div className="svg--wrapper">
-          <Gantt tasks={ this.orderTasks(this.state.tasks) } getSVG={ this.getSVG } constants={ constants } />
+          <Gantt tasks={ this.state.tasks } getSVG={ this.getSVG } constants={ constants } />
           <div className="general-controls--wrapper">
             { this.getGanttSizeControls() }
             <div className="download--button" onClick={ this.downloadSVGGantt }>Download</div>

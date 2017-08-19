@@ -85,6 +85,9 @@ const orderTasks = tasks_original=> {
       task.endDate = maxDate;
     }
 
+  // Sort by task date again
+  tasks.sort((a, b) => a.startDate - b.startDate);
+
   // Update init date
 
   return tasks;

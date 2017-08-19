@@ -126,7 +126,7 @@ class Gantt extends Component {
     this.drawAllTasks();
 
     // // Draw the view now:
-    paper.view.draw();
+    // paper.view.draw();
   }
 
   drawGanttChart() {
@@ -136,7 +136,7 @@ class Gantt extends Component {
       this.drawAllTasks();
 
       // Draw the view now:
-      paper.view.draw();
+      // paper.view.draw();
     }
   }
 

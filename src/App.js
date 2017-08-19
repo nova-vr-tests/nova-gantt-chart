@@ -309,10 +309,10 @@ class App extends Component {
     return (
       <div className="size-controls--wrapper">
         <div>
-          <label for="x">X-unit:</label><input name="x" value={ this.state.base.x } onChange={ handleChange } />
+          <label htmlFor="x">X-unit:</label><input name="x" value={ this.state.base.x } onChange={ handleChange } />
         </div>
         <div>
-          <label for="y">Y-unit:</label><input name="y" value={ this.state.base.y } onChange={ handleChange } />
+          <label htmlFor="y">Y-unit:</label><input name="y" value={ this.state.base.y } onChange={ handleChange } />
         </div>
       </div>
     )

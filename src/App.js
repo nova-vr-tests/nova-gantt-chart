@@ -36,7 +36,7 @@ class App extends Component {
     this.getGanttSizeControls = this.getGanttSizeControls.bind(this);
 
     const week = this.weeksToDate;
-    this.state.tasks = [
+    this.state.tasks = this.orderTasks([
       {
         title: "Hardware install",
         startDate: week(0),
@@ -128,7 +128,7 @@ class App extends Component {
         subtasks: [],
         color: '#926cad',
       }
-    ];
+    ]);
   }
 
   orderTasks(tasks_original) {

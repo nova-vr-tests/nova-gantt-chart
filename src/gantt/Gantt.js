@@ -162,7 +162,11 @@ class Gantt extends Component {
     }
 
     yCoord += this.constants.BASE_HEIGHT * 2;
-    this.drawCalendarLine(tasks[0].startDate, tasks[tasks.length - 1].endDate, yCoord);
+    const svgSize = this.drawCalendarLine(tasks[0].startDate, tasks[tasks.length - 1].endDate, yCoord);
+
+    paper.view.viewSize.width = svgSize.x;
+    paper.view.viewSize.height = svgSize.y;
+
 
     this.exportGanttToSVG();
   }
@@ -395,13 +399,13 @@ class Gantt extends Component {
   }
 
   drawCalendarLine(startDate, endDate, yCoord) {
-    this.drawArrow(this.constants.TASK_TITLE_START, this.dateToXCoord(endDate) + 4 * this.constants.BASE_WIDTH, yCoord, this.constants.CALENDAR, this.constants.CALENDAR_BG_COLOR);
+    const endPoint = this.drawArrow(this.constants.TASK_TITLE_START, this.dateToXCoord(endDate) + 4 * this.constants.BASE_WIDTH, yCoord, this.constants.CALENDAR, this.constants.CALENDAR_BG_COLOR);
 
-      const points = [];
-      const mondays = [];
-      const monthGraduation = [];
-      let year;
-      const months = [];
+    const points = [];
+    const mondays = [];
+    const monthGraduation = [];
+    let year;
+    const months = [];
     const drawCalendarGraduation = () => {
 
       const deltaDays = diffInDays(startDate, endDate);
@@ -467,6 +471,7 @@ class Gantt extends Component {
         addDays(date_m, 1);
       };
 
+
     };
 
     const drawMonths = () => {
@@ -529,6 +534,15 @@ class Gantt extends Component {
     drawCalendarGraduation();
     drawMonths();
     drawLogo();
+
+    // Calendar arrow defines SVG's furthest coordinates
+    // We use this to infer the SVG framing
+    const svgSize = {
+      x: endPoint.x,
+      y: year.bounds.bottom,
+    };
+
+    return svgSize;
   }
 
   render() {
@@ -537,7 +551,7 @@ class Gantt extends Component {
     return (
       <div className="gantt">
         <h1>Gantt</h1>
-        <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'none' }}></canvas>
+        <canvas id="gantt-canvas" height={ 500 } width={ 500 } style={{ display: 'none' }}></canvas>
         <div className="svg--wrapper">
           <div id="svg"></div>
           <div className="download--button" onClick={ this.downloadSVGGantt }>Download</div>

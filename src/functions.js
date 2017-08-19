@@ -1,5 +1,4 @@
 function download(strData, strFileName, strMimeType) {
-  console.log(strData, "data")
   var D = document,
     A = arguments,
     a = D.createElement("a"),

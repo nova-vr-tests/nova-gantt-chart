@@ -15,7 +15,11 @@ class App extends Component {
     this.state = {
       initDate: '09/17/2017',
       getInitDate : () => new Date(this.state.initDate),
-    }
+      base: {
+        x: 10,
+        y: 14,
+      },
+    };
     
 
     this.orderTasks = this.orderTasks.bind(this);
@@ -28,6 +32,7 @@ class App extends Component {
     this.removeSubtask = this.removeSubtask.bind(this);
     this.getSVG = this.getSVG.bind(this);
     this.downloadSVGGantt = this.downloadSVGGantt.bind(this);
+    this.getGanttSizeControls = this.getGanttSizeControls.bind(this);
 
     const week = this.weeksToDate;
     this.state.tasks = [
@@ -301,6 +306,25 @@ class App extends Component {
     download(this.svg.outerHTML, 'gantt.svg', 'text/svg+xml');
   }
 
+  getGanttSizeControls() {
+    const handleChange = e => {
+      const base = this.state.base;
+      base[e.target.name] = e.target.value;
+      this.setState({ base, });
+    };
+
+    return (
+      <div className="size-controls--wrapper">
+        <div>
+          <label for="x">X-unit:</label><input name="x" value={ this.state.base.x } onChange={ handleChange } />
+        </div>
+        <div>
+          <label for="y">Y-unit:</label><input name="y" value={ this.state.base.y } onChange={ handleChange } />
+        </div>
+      </div>
+    )
+  }
+
   render() {
     const styles = {
       main: {
@@ -309,12 +333,19 @@ class App extends Component {
       },
     };
 
+    const constants = {};
+    constants.BASE_HEIGHT = this.state.base.y;                // task arrow height
+    constants.BASE_WIDTH = this.state.base.x;                 // x-coord difference between 2 days 
+
     return (
       <div className="App" style={ styles.main }>
         { this.getForm() }
         <div className="svg--wrapper">
-          <Gantt tasks={ this.orderTasks(this.state.tasks) } getSVG={ this.getSVG } />
-          <div className="download--button" onClick={ this.downloadSVGGantt }>Download</div>
+          <Gantt tasks={ this.orderTasks(this.state.tasks) } getSVG={ this.getSVG } constants={ constants } />
+          <div className="general-controls--wrapper">
+            { this.getGanttSizeControls() }
+            <div className="download--button" onClick={ this.downloadSVGGantt }>Download</div>
+          </div>
         </div>
       </div>
     );

@@ -186,8 +186,11 @@ class App extends Component {
     })
   }
 
-  removeTask() {
+  removeTask(i) {
+    const tasks = [...this.state.tasks];
+    tasks.splice(i, 1);
 
+    this.setState({ tasks, });
   }
 
   addSubtask(i) {
@@ -247,7 +250,7 @@ class App extends Component {
               <div className="date-pickers">
                 <Datepicker selected={ moment(convertDateToString(task.startDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "startDate") } />
                 <Datepicker selected={ moment(convertDateToString(task.endDate), "YYYY-MM-DD") } onChange={ e => this.handleInputChange(e, i, -1, "endDate") } />
-                <div className="remove-task--button">Remove</div>
+                <div className="remove-task--button" onClick={ () => this.removeTask(i) }>Remove</div>
               </div>
             </div>
             <div className="subtask-lines--wrapper">

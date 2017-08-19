@@ -137,7 +137,6 @@ class App extends Component {
 
   handleInputChange(event, i, j = -1, date="startDate") {
     const target = event.target;
-    console.log(event)
 
     const convertMomentToDate = moment => {
       const y = moment.year();
@@ -146,7 +145,6 @@ class App extends Component {
 
       return new Date(y + "/" + (m + 1)  + "/" + d);
     }
-    console.log(convertMomentToDate, convertMomentToDate(event));
 
     const tasks = [...this.state.tasks ];
 

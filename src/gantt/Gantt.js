@@ -19,6 +19,8 @@ class Gantt extends Component {
   constructor(props) {
     super(props);
 
+    this.svgRange = document.createRange();
+
     // Constant used to build chart elements
     this.constants = {};
     // Base dimensions
@@ -172,10 +174,14 @@ class Gantt extends Component {
   exportGanttToSVG() {
     const svg = paper.project.exportSVG();
     console.log(svg);
+    
+    
 
-    const range = document.createRange();
-    range.selectNode(document.getElementById('svg'));
-    range.insertNode(svg);
+    for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
+      document.getElementsByTagName('svg')[0].remove();
+
+    this.svgRange.selectNode(document.getElementById('svg'));
+    this.svgRange.insertNode(svg);
 
   }
 
@@ -532,7 +538,7 @@ class Gantt extends Component {
     return (
       <div className="gantt">
         <h1>Gantt</h1>
-        <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'block' }}></canvas>
+        <canvas id="gantt-canvas" height={1000} width={2000} style={{ display: 'none' }}></canvas>
         <div id="svg"></div>
       </div>
     );

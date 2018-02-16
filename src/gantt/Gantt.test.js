@@ -1,6 +1,7 @@
 require('canvas')
 import React from 'react'
 import Gantt from './Gantt.js'
+import * as paper from 'paper'
 
 const initProps = {
     constants: {},
@@ -18,7 +19,9 @@ const ganttFactory = (mockKeys, props = initProps) => {
 }
 
 const initGlobalMocks = () => {
-      document.createRange = jest.fn()
+    document.createRange = jest.fn()
+    document.getElementById = () => 2// jest.fn()
+    paper.default.setup = jest.fn()
 }
 
 describe('componentDidMount', () => {
@@ -174,6 +177,25 @@ describe('updateConstants', () => {
       expect(gantt.constants.CALENDAR_MONTH_MARK_HEIGHT).toEqual(8)
       expect(gantt.constants.CALENDAR_MONTH_FONT_SIZE).toEqual(12)
       expect(gantt.constants.CALENDAR_YEAR_FONT_SIZE).toEqual(18)
+  })
+})
 
+describe('setupCanvas', () => {
+  beforeEach(() => {
+      initGlobalMocks()
+  })
+
+  test('calls paper.setup with correct parameters', () => {
+      const gantt = ganttFactory(['drawAllTasks'])
+      gantt.setupCanvas()
+
+      expect(paper.default.setup.mock.calls).toEqual([[document.getElementById()]])
+  })
+
+  test('calls drawAllTasks with correct parameters', () => {
+      const gantt = ganttFactory(['drawAllTasks'])
+      gantt.setupCanvas()
+
+      expect(gantt.drawAllTasks.mock.calls).toEqual([[]])
   })
 })

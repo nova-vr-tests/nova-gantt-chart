@@ -199,3 +199,32 @@ describe('setupCanvas', () => {
       expect(gantt.drawAllTasks.mock.calls).toEqual([[]])
   })
 })
+
+describe('drawGanttChart', () => {
+  beforeEach(() => {
+      initGlobalMocks()
+  })
+
+  test('clears paper project if it exists', () => {
+      paper.default.project = { clear: jest.fn() }
+      const gantt = ganttFactory(['drawAllTasks'])
+      gantt.drawGanttChart()
+
+      expect(paper.default.project.clear.mock.calls).toEqual([[]])
+  })
+
+  test('does not clear paper project if it does not exist', () => {
+      paper.default.project = 0
+      const gantt = ganttFactory(['drawAllTasks'])
+      gantt.drawGanttChart()
+
+      expect(gantt.drawAllTasks.mock.calls).toEqual([])
+  })
+
+  test('calls drawAllTasks with correct parameters', () => {
+      const gantt = ganttFactory(['drawAllTasks'])
+      gantt.setupCanvas()
+
+      expect(gantt.drawAllTasks.mock.calls).toEqual([[]])
+  })
+})

@@ -311,10 +311,8 @@ describe('drawAllTasks', () => {
       expect(gantt.props.getSVG.mock.calls).toEqual([[11]])
   })
 
-  test('calls getSVG with correct params', () => {
+  test('calls drawCalendarLine with correct params', () => {
       const gantt = drawAllTasksFractory()
-      const answer = 11
-      gantt.exportGanttToSVG.mockImplementation(() => answer)
 
       gantt.drawAllTasks()
 
@@ -348,5 +346,89 @@ describe('drawAllTasks', () => {
                    + gantt.constants.BASE_HEIGHT * 2
                ),
            ]])
+  })
+
+  test('calls drawTaskLine with correct params', () => {
+      const gantt = drawAllTasksFractory()
+
+      gantt.drawAllTasks()
+
+      const task1 = gantt.props.tasks[0]
+      let yCoord = gantt.constants.FIRST_TASK_Y
+      expect(gantt.drawTaskLine.mock.calls[0])
+           .toEqual([
+               task1.title,
+               task1.startDate,
+               task1.endDate,
+               yCoord,
+               task1.color,
+           ])
+
+      const subtask1 = gantt.props.tasks[0].subtasks[0]
+      yCoord += gantt.constants.TASK_ARROW_HEIGHT / 2 + gantt.constants.TASK_INTERLINE + gantt.constants.SUBTASK_ARROW_HEIGHT / 2;
+      expect(gantt.drawSubtaskLine.mock.calls[0])
+           .toEqual([
+               subtask1.title,
+               subtask1.startDate,
+               subtask1.endDate,
+               yCoord,
+               task1.color,
+           ])
+
+      const subtask2 = gantt.props.tasks[0].subtasks[1]
+      yCoord += gantt.constants.SUBTASK_INTERLINE + gantt.constants.SUBTASK_ARROW_HEIGHT;
+      expect(gantt.drawSubtaskLine.mock.calls[1])
+           .toEqual([
+               subtask2.title,
+               subtask2.startDate,
+               subtask2.endDate,
+               yCoord,
+               task1.color,
+           ])
+
+     const task2 = gantt.props.tasks[1]
+     yCoord += gantt.constants.SUBTASK_ARROW_HEIGHT + gantt.constants.BASE_HEIGHT * 2;
+     expect(gantt.drawTaskLine.mock.calls[1])
+        .toEqual([
+            task2.title,
+            task2.startDate,
+            task2.endDate,
+            yCoord,
+            task2.color,
+        ])
+
+      const subtask3 = gantt.props.tasks[1].subtasks[0]
+      yCoord += gantt.constants.TASK_ARROW_HEIGHT / 2 + gantt.constants.TASK_INTERLINE + gantt.constants.SUBTASK_ARROW_HEIGHT / 2;
+      expect(gantt.drawSubtaskLine.mock.calls[2])
+          .toEqual([
+              subtask3.title,
+              subtask3.startDate,
+              subtask3.endDate,
+              yCoord,
+              task2.color,
+          ])
+
+      const subtask4 = gantt.props.tasks[1].subtasks[1]
+      yCoord += gantt.constants.SUBTASK_INTERLINE + gantt.constants.SUBTASK_ARROW_HEIGHT;
+      expect(gantt.drawSubtaskLine.mock.calls[3])
+          .toEqual([
+              subtask4.title,
+              subtask4.startDate,
+              subtask4.endDate,
+              yCoord,
+              task2.color,
+          ])
+
+      const subtask5 = gantt.props.tasks[1].subtasks[2]
+      yCoord += gantt.constants.SUBTASK_INTERLINE + gantt.constants.SUBTASK_ARROW_HEIGHT;
+      expect(gantt.drawSubtaskLine.mock.calls[4])
+          .toEqual([
+              subtask5.title,
+              subtask5.startDate,
+              subtask5.endDate,
+              yCoord,
+              task2.color,
+          ])
+
   })
 })

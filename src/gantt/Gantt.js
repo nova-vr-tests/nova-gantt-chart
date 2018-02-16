@@ -119,6 +119,8 @@ class Gantt extends Component {
     this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8;
     this.constants.CALENDAR_MONTH_FONT_SIZE = 12;
     this.constants.CALENDAR_YEAR_FONT_SIZE = 18;
+
+      this.view = paper.view
   }
 
   /**
@@ -176,8 +178,8 @@ class Gantt extends Component {
     const calendarEndDate = tasks.map(t => t.endDate).sort((a, b) => a- b).reverse()[0];
     const svgSize = this.drawCalendarLine(tasks[0].startDate, calendarEndDate, yCoord);
 
-    paper.view.viewSize.width = svgSize.x;
-    paper.view.viewSize.height = svgSize.y;
+    this.view.viewSize.width = svgSize.x;
+    this.view.viewSize.height = svgSize.y;
 
 
     // 

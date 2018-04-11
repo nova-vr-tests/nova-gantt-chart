@@ -370,7 +370,7 @@ class Gantt extends Component {
     const points = [];
     const numPoints = Math.floor(diffInDays(startDate, endDate) / 7);
 
-    for (let i = 0; i <= numPoints + 1; i++) {
+    for (let i = 0; i <= numPoints; i++) {
       if (i === 0) {
           const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + (this.constants.TASK_ARROW_HEIGHT - this.constants.TASK_FONT_SIZE) / 2));
         text.strokeColor = this.constants.TEXT_COLOR;

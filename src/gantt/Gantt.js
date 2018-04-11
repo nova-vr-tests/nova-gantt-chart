@@ -65,11 +65,14 @@ class Gantt extends Component {
     this.constants.CALENDAR_ARROW_HEIGHT = 2 * this.constants.BASE_HEIGHT;
     this.constants.TASK_TITLE_START = 20;
     this.constants.SUBTASK_TITLE_START = 40;
-    this.constants.DATE_GRADUATION_START = 250;     // where date graduation starts
+    this.constants.DATE_GRADUATION_START = this.props.constants.DATE_GRADUATION_START || 350;     // where date graduation starts
     this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT;
     this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER * 0.75;
     this.constants.CALENDAR_GRADUATION_START = 10;
     this.constants.SUBTASK_COLOR_OPACITY = 0.6;
+    this.constants.TASK_TIP_LENGTH = this.props.constants.TASK_TIP_LENGTH || 45;
+    this.constants.SUBTASK_TIP_LENGTH = this.props.constants.SUBTASK_TIP_LENGTH || 35;
+    this.constants.TASK_ARROW_END_DATE_OFFSET = this.props.constants.TASK_ARROW_END_DATE_OFFSET || 10;
 
     // Colors
     this.constants.CALENDAR_BG_COLOR = '#CCCABC';
@@ -81,9 +84,9 @@ class Gantt extends Component {
     this.constants.SUBTASK_INTERLINE = 0.5 * this.constants.BASE_HEIGHT;
 
     // Fonts
-    this.constants.TASK_FONT_SIZE = 9;
-    this.constants.SUBTASK_FONT_SIZE = 7;
-    this.constants.CALENDAR_GRADUATION_FONT_SIZE = 10;
+    this.constants.TASK_FONT_SIZE = this.props.constants.TASK_FONT_SIZE || 18;
+    this.constants.SUBTASK_FONT_SIZE = this.props.constants.SUBTASK_FONT_SIZE || 14;
+    this.constants.CALENDAR_GRADUATION_FONT_SIZE = this.props.constants.CALENDAR_GRADUATION_FONT_SIZE || 10;
 
     this.constants.FONT_FAMILY = 'Courier New';
     this.constants.FONT_STROKE_WIDTH = 0.4,
@@ -320,19 +323,22 @@ class Gantt extends Component {
       ARROW_START = this.constants.TASK_TITLE_START;
       TEXT_START = this.constants.TASK_TITLE_START_OFFSET;
       FONT_SIZE = this.constants.TASK_FONT_SIZE;
-      TIP_LENGTH = 45;
+      TIP_LENGTH = this.constants.TASK_TIP_LENGTH;
     } else {
       ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
       ARROW_START = this.constants.SUBTASK_TITLE_START;
       TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
       FONT_SIZE = this.constants.SUBTASK_FONT_SIZE;
-      TIP_LENGTH = 35;
+      TIP_LENGTH = this.constants.SUBTASK_TIP_LENGTH;
     }
 
     const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y);
     text.content = title;
     text.fontSize = FONT_SIZE;
-    const arrowEndPoint = this.drawArrow(ARROW_START, ARROW_START + text.bounds.right - text.bounds.left + ARROW_HEIGHT / 2 + TIP_LENGTH, yCoord, taskType, color, false);
+
+    const ARROW_END = ARROW_START + text.bounds.right - text.bounds.left + ARROW_HEIGHT / 2 + TIP_LENGTH + TITLE_PADDING_RIGHT
+
+    const arrowEndPoint = this.drawArrow(ARROW_START, ARROW_END, yCoord, taskType, color, false);
     const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2);
     circle.fillColor = color;
 
@@ -366,17 +372,19 @@ class Gantt extends Component {
 
     for (let i = 0; i <= numPoints + 1; i++) {
       if (i === 0) {
-        const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + 4));
+          const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + (this.constants.TASK_ARROW_HEIGHT - this.constants.TASK_FONT_SIZE) / 2));
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+          text.fontSize = this.constants.TASK_FONT_SIZE;
         // text.content = addDays(startDate, 1).getDate();
         text.content = (addDays(startDate, 1).getDate() + '').length < 2 ? '0' + startDate.getDate() : startDate.getDate();
         text.fillColor = this.constants.TEXT_COLOR;
       } else if (i === numPoints) {
-        const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2 - 8, yCoord + 4));
+          const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2 - this.constants.TASK_ARROW_END_DATE_OFFSET, yCoord + (this.constants.TASK_ARROW_HEIGHT - this.constants.TASK_FONT_SIZE) / 2));
         text.strokeColor = this.constants.TEXT_COLOR;
         text.fontFamily = this.constants.FONT_FAMILY;
+          text.fontSize = this.constants.TASK_FONT_SIZE;
         text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
         text.content = (addDays(endDate, -1).getDate() + '').length < 2 ? '0' + endDate.getDate() : endDate.getDate();
         text.fillColor = this.constants.TEXT_COLOR;
@@ -493,6 +501,7 @@ class Gantt extends Component {
         months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2.5 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2);
         const m = n + i; // Current month number
         months[i].content = monthsNames[m % 12 ? m % 12 - 1: 11];
+        months[i].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE + 2
 
         if(i === 0) {
           if(months[i].bounds.right < monthGraduation[0].bounds.left) {

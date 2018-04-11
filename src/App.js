@@ -20,6 +20,15 @@ class App extends Component {
         x: 10,
         y: 14,
       },
+      constants: {
+          DATE_GRADUATION_START: 350,
+          TASK_FONT_SIZE: 18,
+          SUBTASK_FONT_SIZE: 14,
+          CALENDAR_GRADUATION_FONT_SIZE: 10,
+          TASK_TIP_LENGTH: 45,
+          SUBTASK_TIP_LENGTH: 35,
+          TASK_ARROW_END_DATE_OFFSET: 10,
+      }
     };
     
 
@@ -300,19 +309,62 @@ class App extends Component {
   }
 
   getGanttSizeControls() {
-    const handleChange = e => {
+    const handleBaseChange = e => {
       const base = this.state.base;
       base[e.target.name] = e.target.value;
       this.setState({ base, });
     };
 
+    const handleConstantChange = e => {
+      const constants = this.state.constants;
+        constants[e.target.name] = parseFloat(e.target.value)
+        console.log(constants)
+      this.setState({ constants, });
+    };
+
+    const styles = {
+      constantInput: {
+        display: 'flex',
+        width: '100%',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      constantInputWrapper: {
+        display: 'flex',
+        flexDirection: 'column',
+      },
+      controlsWrapper: {
+          height: 'inherit',
+      }
+    }
+
+    const ConstantInput = ({ constantKey }) => (
+      <div style={ styles.constantInput } >
+        <label htmlFor={ constantKey }>{ constantKey }:</label>
+        <input name={ constantKey } value={ this.state.constants[constantKey] } onChange={ handleConstantChange } />
+      </div>
+    )
+
+    const inputs = [
+      "DATE_GRADUATION_START",
+      "TASK_FONT_SIZE",
+      "SUBTASK_FONT_SIZE",
+      "CALENDAR_GRADUATION_FONT_SIZE",
+      "TASK_TIP_LENGTH",
+      "SUBTASK_TIP_LENGTH",
+      "TASK_ARROW_END_DATE_OFFSET",
+    ].map((e, i) => <ConstantInput constantKey={ e } key={ i } />)
+
     return (
-      <div className="size-controls--wrapper">
+      <div className="size-controls--wrapper" style={ styles.controlsWrapper }>
         <div>
-          <label htmlFor="x">X-unit:</label><input name="x" value={ this.state.base.x } onChange={ handleChange } />
+          <label htmlFor="x">X-unit:</label><input name="x" value={ this.state.base.x } onChange={ handleBaseChange } />
         </div>
         <div>
-          <label htmlFor="y">Y-unit:</label><input name="y" value={ this.state.base.y } onChange={ handleChange } />
+          <label htmlFor="y">Y-unit:</label><input name="y" value={ this.state.base.y } onChange={ handleBaseChange } />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          { inputs }
         </div>
       </div>
     )

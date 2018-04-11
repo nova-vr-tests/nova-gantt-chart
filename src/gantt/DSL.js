@@ -51,6 +51,8 @@ const parser = str => {
             ast.push({
                 title: word.value,
                 subtasks: [],
+                startDate: "",
+                endDate: "",
             })
             break
         case 'START_DATE':
@@ -75,6 +77,8 @@ const parser = str => {
             task = ast[ast.length - 1]
             task.subtasks.push({
                 title: word.value,
+                startDate: "",
+                endDate: "",
             })
             break
         }

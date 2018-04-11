@@ -453,7 +453,7 @@ class Gantt extends Component {
         }
 
         // Show point of not Monday
-        if(date_m.getDay() !== 0) {
+        if(date_m.getDay() !== 1) {
           points[i] = new paper.Path.Circle(
             new paper.Point(x, pointYCoord), 
             this.constants.CALENDAR_ARROW_POINT_DIAMETER / 2,

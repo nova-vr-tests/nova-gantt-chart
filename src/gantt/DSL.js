@@ -1,13 +1,6 @@
-const a = {
-    hey: true
-}
 
-const { hey } = a
-
-console.log('yo', a, hey)
-
-const str = "    \n     my     \n     dad is cool     \n"
 const keywords = "TASK SUBTASK START_DATE END_DATE".split(/\s+/)
+
 const lex = str => str
     .trim()
     .split(/\n+/)

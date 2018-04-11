@@ -37,13 +37,56 @@ const subject = `
                      END_DATE 4w
                  SUBTASK who are you
                      START_DATE 2w
-                     END_DATE 4w`
+                     END_DATE 4w
+             TASK hey
+                 START_DATE 2w
+                 END_DATE 4w`
+
+const countTasks = lexerOutput => lexerOutput.filter(([keyword]) => keyword.value === 'TASK').length
 
 const parser = str => {
     const lexerOutput = lex(str)
-    const ast = lexerOutput
+    const numTasks = countTasks(lexerOutput)
 
+    const ast = []
+
+    for(let i = 0; i < lexerOutput.length; i++) {
+        const [keyword, word] = lexerOutput[i]
+        let task
+        switch(keyword.value) {
+        case 'TASK':
+            ast.push({
+                title: word.value,
+                subtasks: [],
+            })
+            break
+        case 'START_DATE':
+            task = ast[ast.length - 1]
+            if(task.subtasks.length) {
+                const subtask = task.subtasks[task.subtasks.length - 1]
+                subtask.startDate = word.value
+            } else {
+                task.startDate = word.value
+            }
+            break
+        case 'END_DATE':
+            task = ast[ast.length - 1]
+            if(task.subtasks.length) {
+                const subtask = task.subtasks[task.subtasks.length - 1]
+                subtask.endDate = word.value
+            } else {
+                task.endDate = word.value
+            }
+            break
+        case 'SUBTASK':
+            task = ast[ast.length - 1]
+            task.subtasks.push({
+                title: word.value,
+            })
+            break
+        }
+    }
     return ast
 }
 
-console.log(parser(subject))
+console.log(JSON.stringify(parser(subject), null, 2))

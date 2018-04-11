@@ -317,6 +317,7 @@ class Gantt extends Component {
 
   drawTaskTitle(title, yCoord, taskType = this.constants.TASK, color) {
     let ARROW_HEIGHT, ARROW_START, TEXT_START, FONT_SIZE, TIP_LENGTH;
+    const TITLE_PADDING_RIGHT = 10 // px
 
     if (taskType === this.constants.TASK) {
       ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;

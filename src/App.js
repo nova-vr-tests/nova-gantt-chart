@@ -378,7 +378,7 @@ class App extends Component {
       },
     };
 
-    const constants = {};
+    const constants = this.state.constants;
     constants.BASE_HEIGHT = this.state.base.y;                // task arrow height
     constants.BASE_WIDTH = this.state.base.x;                 // x-coord difference between 2 days 
 

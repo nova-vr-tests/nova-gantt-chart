@@ -37,7 +37,26 @@ const subject = `
 
 const countTasks = lexerOutput => lexerOutput.filter(([keyword]) => keyword.value === 'TASK').length
 
-const parser = str => {
+// callbacks: Array<[char, c: int => Date]>
+const parseDate = (str, callbacks) => {
+    const unit = str.slice(str.length - 1, str.length)
+    const magnitude = parseInt(str.slice(0, str.length - 1))
+
+    if(isNaN(magnitude))
+        return "Syntax Error: cannot parse date, argument is NaN"
+
+    for(let i = 0; i < callbacks.length; i++) {
+        const char = callbacks[i][0]
+        const callback = callbacks[i][1]
+
+        if(unit === char)
+            return callback(magnitude)
+    }
+
+    return "Syntax Error: unit does not exist"
+}
+
+const parser = (str, callbacks) => {
     const lexerOutput = lex(str)
     const numTasks = countTasks(lexerOutput)
 
@@ -51,29 +70,49 @@ const parser = str => {
             ast.push({
                 title: word.value,
                 subtasks: [],
-                startDate: "",
-                endDate: "",
+                startDate: '',
+                endDate: '',
+                color: 'red',
             })
             break
+        case 'COLOR':
+            if(!ast.length)
+                return "Syntax error: no TASK has been defined"
+
+            task = ast[ast.length - 1]
+            task.color = word.value
+
+            break
         case 'START_DATE':
+            if(!ast.length)
+                return "Syntax error: no TASK has been defined"
+
+            const startDate = parseDate(word.value, callbacks)
             task = ast[ast.length - 1]
             if(task.subtasks.length) {
                 const subtask = task.subtasks[task.subtasks.length - 1]
-                subtask.startDate = word.value
+                subtask.startDate = startDate
             } else {
-                task.startDate = word.value
+                task.startDate = startDate
             }
             break
         case 'END_DATE':
+            if(!ast.length)
+                return "Syntax error: no TASK has been defined"
+
+            const endDate = parseDate(word.value, callbacks)
             task = ast[ast.length - 1]
             if(task.subtasks.length) {
                 const subtask = task.subtasks[task.subtasks.length - 1]
-                subtask.endDate = word.value
+                subtask.endDate = endDate
             } else {
-                task.endDate = word.value
+                task.endDate = endDate
             }
             break
         case 'SUBTASK':
+            if(!ast.length)
+                return "Syntax error: no TASK has been defined"
+
             task = ast[ast.length - 1]
             task.subtasks.push({
                 title: word.value,
@@ -86,4 +125,9 @@ const parser = str => {
     return ast
 }
 
-console.log(JSON.stringify(parser(subject), null, 2))
+function weeksToDate(weeks) {
+    const initDate = () => new Date();
+    return new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
+}
+
+export default parser

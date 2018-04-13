@@ -66,49 +66,45 @@ class SrcEditor extends React.Component {
         this.textOutput = element
     }
 
-      this.setTextInputRef = element => {
-          this.textInput = element
-      }
+     this.setTextInputRef = element => {
+       this.textInput = element
+     }
 
-    this.highlightKeywords = this.highlightKeywords.bind(this)
-    this.syncScroll = this.syncScroll.bind(this)
-      this.handleTrailingLineBreak = this.handleTrailingLineBreak.bind(this)
+     this.highlightKeywords = this.highlightKeywords.bind(this)
+     this.syncScroll = this.syncScroll.bind(this)
+     this.handleTrailingLineBreak = this.handleTrailingLineBreak.bind(this)
 	}
 
-
-    componentDidMount() {
-
-    }
 
 	handleChange(e) {
 		this.setState({ str: e.target.value })
 	}
 
-    componentDidUpdate() {
-        this.handleTrailingLineBreak()
-        this.textOutput.scrollTop = this.textInput.scrollTop
-    }
+   componentDidUpdate() {
+     this.handleTrailingLineBreak()
+     this.textOutput.scrollTop = this.textInput.scrollTop
+   }
 
-    highlightKeywords(str) {
-        return str
-            .replace(/SUBTASK/g, "<strong style='color: blue'>SUBTASK</strong\>")
-            .replace(/TASK /g, "<strong style='color: red'>TASK </strong\>")
-            .replace(/START_DATE/g, "<strong style='color: purple'>START_DATE</strong\>")
-            .replace(/END_DATE/g, "<strong style='color: purple'>END_DATE</strong\>")
-            .replace(/COLOR/g, "<strong style='color: purple'>COLOR</strong\>")
-            .replace(/([0-9]+)(w)/g, "$1<strong style='color: grey'>$2</strong\>")
-    }
+   highlightKeywords(str) {
+     return str
+       .replace(/SUBTASK/g, "<strong style='color: blue'>SUBTASK</strong\>")
+       .replace(/TASK /g, "<strong style='color: red'>TASK </strong\>")
+       .replace(/START_DATE/g, "<strong style='color: purple'>START_DATE</strong\>")
+       .replace(/END_DATE/g, "<strong style='color: purple'>END_DATE</strong\>")
+       .replace(/COLOR/g, "<strong style='color: purple'>COLOR</strong\>")
+       .replace(/([0-9]+)(w)/g, "$1<strong style='color: grey'>$2</strong\>")
+   }
 
-    handleTrailingLineBreak() {
-        if (this.state.str.slice(this.state.str.length - 1, this.state.str.length) === '\n') {
-            this.textOutput.innerHTML += '\n'
-        }
-    }
+   handleTrailingLineBreak() {
+     if (this.state.str.slice(this.state.str.length - 1, this.state.str.length) === '\n') {
+         this.textOutput.innerHTML += '\n'
+     }
+   }
 
-    syncScroll(e) {
-        this.handleTrailingLineBreak()
-        this.textOutput.scrollTop = e.target.scrollTop
-    }
+   syncScroll(e) {
+     this.handleTrailingLineBreak()
+     this.textOutput.scrollTop = e.target.scrollTop
+   }
 
 	render() {
     const textareaHeight = '30rem'

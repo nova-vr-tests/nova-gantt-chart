@@ -61,13 +61,56 @@ class SrcEditor extends React.Component {
 		}
 
 		this.handleChange = this.handleChange.bind(this)
+
+    this.setTextOutputRef = element => {
+        this.textOutput = element
+    }
+
+      this.setTextInputRef = element => {
+          this.textInput = element
+      }
+
+    this.highlightKeywords = this.highlightKeywords.bind(this)
+    this.syncScroll = this.syncScroll.bind(this)
+      this.handleTrailingLineBreak = this.handleTrailingLineBreak.bind(this)
 	}
+
+
+    componentDidMount() {
+
+    }
 
 	handleChange(e) {
 		this.setState({ str: e.target.value })
+    this.handleTrailingLineBreak()
+    this.textOutput.scrollTop = this.textInput.scrollTop
 	}
 
+    highlightKeywords(str) {
+        return str
+            .replace(/SUBTASK/g, "<strong style='color: blue'>SUBTASK</strong\>")
+            .replace(/TASK /g, "<strong style='color: red'>TASK </strong\>")
+            .replace(/START_DATE/g, "<strong style='color: purple'>START_DATE</strong\>")
+            .replace(/END_DATE/g, "<strong style='color: purple'>END_DATE</strong\>")
+            .replace(/COLOR/g, "<strong style='color: purple'>COLOR</strong\>")
+            .replace(/([0-9]+)(w)/g, "$1<strong style='color: grey'>$2</strong\>")
+    }
+
+    handleTrailingLineBreak() {
+        if (this.state.str.slice(this.state.str.length - 1, this.state.str.length) === '\n'
+            && this.textOutput.innerHTML.slice(this.textOutput.innerHTML.length - 1, this.textOutput.innerHTML.length)) {
+            this.textOutput.innerHTML += '\n'
+        }
+    }
+
+    syncScroll(e) {
+        this.handleTrailingLineBreak()
+        this.textOutput.scrollTop = e.target.scrollTop
+    }
+
 	render() {
+    const textareaHeight = '30rem'
+    const textareaWidth = '30rem'
     const styles = {
         wrapper: {
             display: 'flex',
@@ -75,19 +118,53 @@ class SrcEditor extends React.Component {
         },
         button: {},
         textArea: {
-            margin: '2rem',
+            position: 'absolute',
+            color: 'rgba(0, 0, 0, 0)',
+            caretColor: 'red',
+            width: textareaWidth,
+            height: textareaHeight,
+            resize: 'none',
+            left: 0,
+            top: 0,
+            margin: 0,
         },
+        pre: {
+            //color: 'rgba(0, 0, 0, 0)',
+            margin: 0,
+            textAlign: 'left',
+            position: 'absolute',
+            pointerEvents: 'none',
+            width: textareaWidth,
+            height: textareaHeight,
+            overflow: 'hidden',
+            left: 0,
+            top: 0,
+        },
+        textareaWrapper: {
+            width: textareaWidth,
+            height: textareaHeight,
+            position: 'relative',
+            margin: '2rem 0',
+        }
     }
 
 		return (
-	  <div style={ styles.wrapper }>
-				<textarea
-          style={ styles.textArea }
-					cols="50"
-					rows="40"
-					onChange={ this.handleChange }
-					value={ this.state.str }></textarea>
-				<button
+	    <div style={ styles.wrapper }>
+        <div style={ styles.textareaWrapper }>
+		    	<textarea
+            ref={ this.setTextInputRef }
+            onScroll={ this.syncScroll }
+            wrap="soft"
+            style={ styles.textArea }
+		    		rows="40"
+		    		onChange={ this.handleChange }
+		    		value={ this.state.str }></textarea>
+          <pre
+            ref={ this.setTextOutputRef }
+            style={ styles.pre }
+            dangerouslySetInnerHTML={{ __html: this.highlightKeywords(this.state.str) }} />
+        </div>
+		    <button
           style={ styles.button }
           onClick={ () => this.props.submitCallback(this.state.str) }>Submit</button>
 			</div>
@@ -341,6 +418,7 @@ class App extends Component {
 				flexDirection: 'column',
 			},
 			controlsWrapper: {
+        padding: '2rem',
 				height: 'inherit',
 			}
 		}
@@ -406,7 +484,7 @@ class App extends Component {
             <div className="general-controls--wrapper">
                 { this.getGanttSizeControls() }
             </div>
-            { this.getForm() }
+            { /* this.getForm() */ }
         </div>
 				<div className="svg--wrapper">
 					<Gantt tasks={ this.state.tasks } getSVG={ this.getSVG } constants={ constants } />

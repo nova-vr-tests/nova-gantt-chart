@@ -100,8 +100,7 @@ class SrcEditor extends React.Component {
     }
 
     handleTrailingLineBreak() {
-        if (this.state.str.slice(this.state.str.length - 1, this.state.str.length) === '\n'
-            && this.textOutput.innerHTML.slice(this.textOutput.innerHTML.length - 1, this.textOutput.innerHTML.length)) {
+        if (this.state.str.slice(this.state.str.length - 1, this.state.str.length) === '\n') {
             this.textOutput.innerHTML += '\n'
         }
     }

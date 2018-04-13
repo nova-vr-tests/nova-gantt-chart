@@ -82,9 +82,12 @@ class SrcEditor extends React.Component {
 
 	handleChange(e) {
 		this.setState({ str: e.target.value })
-    this.handleTrailingLineBreak()
-    this.textOutput.scrollTop = this.textInput.scrollTop
 	}
+
+    componentDidUpdate() {
+        this.handleTrailingLineBreak()
+        this.textOutput.scrollTop = this.textInput.scrollTop
+    }
 
     highlightKeywords(str) {
         return str

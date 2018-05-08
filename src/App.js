@@ -10,7 +10,18 @@ import Datepicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { download, orderTasks } from './functions'
 
+
+const ConstantInput = ({ constantKey, styles, handleConstantChange, constants }) => (
+			  <div style={ styles.constantInput } >
+            <label htmlFor={ constantKey }>{ constantKey }:</label>
+            <input name={ constantKey } value={ constants[constantKey] } onChange={ handleConstantChange } />
+			  </div>
+)
+
+
 const initTasks = `
+INIT_DATE 12/12/10
+
 TASK Lobby customization
     START_DATE 0w
     END_DATE 10w
@@ -91,6 +102,7 @@ class SrcEditor extends React.Component {
        .replace(/TASK /g, "<strong style='color: red'>TASK </strong\>")
        .replace(/START_DATE/g, "<strong style='color: purple'>START_DATE</strong\>")
        .replace(/END_DATE/g, "<strong style='color: purple'>END_DATE</strong\>")
+       .replace(/INIT_DATE/g, "<strong style='color: #6b71b4'>INIT_DATE</strong\>")
        .replace(/COLOR/g, "<strong style='color: purple'>COLOR</strong\>")
        .replace(/([0-9]+)(w)/g, "$1<strong style='color: grey'>$2</strong\>")
    }
@@ -220,7 +232,9 @@ class App extends Component {
 
 	parseTasksSrc(src) {
 		const tasks = this.orderTasks(parser(src, [['w', this.weeksToDate]]))
-		this.setState({ tasks: tasks })
+    const newTasks = tasks.filter(e => !e.projectInitDate)
+    const initDate = tasks.filter(e => e.projectInitDate)[0].projectInitDate
+    this.setState({ tasks: newTasks, initDate })
 	}
 
 	orderTasks(tasks_original) {
@@ -421,13 +435,6 @@ class App extends Component {
 			}
 		}
 
-		const ConstantInput = ({ constantKey }) => (
-			<div style={ styles.constantInput } >
-				<label htmlFor={ constantKey }>{ constantKey }:</label>
-				<input name={ constantKey } value={ this.state.constants[constantKey] } onChange={ handleConstantChange } />
-			</div>
-		)
-
 		const inputs = [
 			'DATE_GRADUATION_START',
 			'TASK_FONT_SIZE',
@@ -436,7 +443,12 @@ class App extends Component {
 			'TASK_TIP_LENGTH',
 			'SUBTASK_TIP_LENGTH',
 			'TASK_ARROW_END_DATE_OFFSET',
-		].map((e, i) => <ConstantInput constantKey={ e } key={ i } />)
+		].map((e, i) => <ConstantInput
+          styles={ styles }
+          constantKey={ e }
+          handleConstantChange={ handleConstantChange }
+          constants={ this.state.constants }
+          key={ i } />)
 
 		return (
 			<div className="size-controls--wrapper" style={ styles.controlsWrapper }>

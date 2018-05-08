@@ -66,6 +66,15 @@ const parser = (str, callbacks) => {
         const [keyword, word] = lexerOutput[i]
         let task
         switch(keyword.value) {
+        case 'INIT_DATE':
+            ast.push({
+                projectInitDate: new Date(word.value),
+                subtasks: [],
+                startDate: '',
+                endDate: '',
+                color: 'red',
+            })
+            break
         case 'TASK':
             ast.push({
                 title: word.value,

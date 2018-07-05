@@ -1,41 +1,25 @@
 
-const keywords = "TASK SUBTASK START_DATE END_DATE".split(/\s+/)
+const keywords = 'TASK SUBTASK START_DATE END_DATE'.split(/\s+/)
 
 const lex = str => str
     .trim()
     .split(/\n+/)
     .map(e => e
-         .split(/\s+/)
-         .filter(e => e !== "")
-         .map(e => ({
-             type: keywords.includes(e) ? 'keyword' : 'word',
-             value: e,
-         })))
-     .map(([ car, ...cdr ]) => {
-         return [
-             car,
-             {
-                 type: 'word',
-                 value: cdr.map(e => e.value).join(' ')
-             }
-         ]
-     })
-
-const subject = `
-             TASK hello
-                 START_DATE 0w
-                 END_DATE 4w
-                 SUBTASK Asset creation
-                     START_DATE 2w
-                     END_DATE 4w
-                 SUBTASK who are you
-                     START_DATE 2w
-                     END_DATE 4w
-             TASK hey
-                 START_DATE 2w
-                 END_DATE 4w`
-
-const countTasks = lexerOutput => lexerOutput.filter(([keyword]) => keyword.value === 'TASK').length
+        .split(/\s+/)
+        .filter(e => e !== '')
+        .map(e => ({
+            type: keywords.includes(e) ? 'keyword' : 'word',
+            value: e,
+        })))
+    .map(([ car, ...cdr ]) => {
+        return [
+            car,
+            {
+                type: 'word',
+                value: cdr.map(e => e.value).join(' ')
+            }
+        ]
+    })
 
 // callbacks: Array<[char, c: int => Date]>
 const parseDate = (str, callbacks) => {
@@ -43,7 +27,7 @@ const parseDate = (str, callbacks) => {
     const magnitude = parseInt(str.slice(0, str.length - 1))
 
     if(isNaN(magnitude))
-        return "Syntax Error: cannot parse date, argument is NaN"
+        return 'Syntax Error: cannot parse date, argument is NaN'
 
     for(let i = 0; i < callbacks.length; i++) {
         const char = callbacks[i][0]
@@ -53,12 +37,11 @@ const parseDate = (str, callbacks) => {
             return callback(magnitude)
     }
 
-    return "Syntax Error: unit does not exist"
+    return 'Syntax Error: unit does not exist'
 }
 
 const parser = (str, callbacks) => {
     const lexerOutput = lex(str)
-    const numTasks = countTasks(lexerOutput)
 
     const ast = []
 
@@ -86,7 +69,7 @@ const parser = (str, callbacks) => {
             break
         case 'COLOR':
             if(!ast.length)
-                return "Syntax error: no TASK has been defined"
+                return 'Syntax error: no TASK has been defined'
 
             task = ast[ast.length - 1]
             task.color = word.value
@@ -94,7 +77,7 @@ const parser = (str, callbacks) => {
             break
         case 'START_DATE':
             if(!ast.length)
-                return "Syntax error: no TASK has been defined"
+                return 'Syntax error: no TASK has been defined'
 
             const startDate = parseDate(word.value, callbacks)
             task = ast[ast.length - 1]
@@ -107,7 +90,7 @@ const parser = (str, callbacks) => {
             break
         case 'END_DATE':
             if(!ast.length)
-                return "Syntax error: no TASK has been defined"
+                return 'Syntax error: no TASK has been defined'
 
             const endDate = parseDate(word.value, callbacks)
             task = ast[ast.length - 1]
@@ -120,23 +103,18 @@ const parser = (str, callbacks) => {
             break
         case 'SUBTASK':
             if(!ast.length)
-                return "Syntax error: no TASK has been defined"
+                return 'Syntax error: no TASK has been defined'
 
             task = ast[ast.length - 1]
             task.subtasks.push({
                 title: word.value,
-                startDate: "",
-                endDate: "",
+                startDate: '',
+                endDate: '',
             })
             break
         }
     }
     return ast
-}
-
-function weeksToDate(weeks) {
-    const initDate = () => new Date();
-    return new Date(new Date(initDate()).setDate(initDate().getDate() + 7 * weeks));
 }
 
 export default parser

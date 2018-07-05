@@ -7,7 +7,7 @@ import Gantt from './gantt/Gantt'
 import moment from 'moment'
 import Datepicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { download, orderTasks } from './functions'
+import { splitTasks, download, orderTasks } from './functions'
 
 
 const initTasks = `
@@ -484,6 +484,16 @@ class App extends Component {
         constants.BASE_HEIGHT = this.state.base.y                // task arrow height
         constants.BASE_WIDTH = this.state.base.x                 // x-coord difference between 2 days 
 
+        const tasks = splitTasks(this.state.tasks, 2)
+        const Gantts = tasks
+              .map((t, i) => <Gantt
+                   canvasId={ "canvas" + i}
+                   svgId={ "svg" + i}
+                   key={ i }
+                   tasks={ t }
+                   getSVG={ this.getSVG }
+                   constants={ constants } />)
+
         return (
             <div className="App" style={ styles.main }>
                 <div>
@@ -492,7 +502,13 @@ class App extends Component {
                     </div>
                 </div>
                 <div className="svg--wrapper">
-                    <Gantt tasks={ this.state.tasks } getSVG={ this.getSVG } constants={ constants } />
+                  <Gantt
+                    tasks={ this.state.tasks }
+                    getSVG={ this.getSVG }
+                    canvasId="foo"
+                    svgId="bar"
+                    constants={ constants } />
+                    { Gantts }
                     <button
                         style={ styles.button }
                         className="download--button"

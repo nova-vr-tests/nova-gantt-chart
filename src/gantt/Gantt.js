@@ -38,6 +38,8 @@ class Gantt extends Component {
         this.exportGanttToSVG = this.exportGanttToSVG.bind(this)
         this.setupCanvas = this.setupCanvas.bind(this)
         this.updateConstants = this.updateConstants.bind(this)
+        this.drawNotStartedTaskLine = this.drawNotStartedTaskLine.bind(this)
+        this.drawNotStartedSubtaskLine = this.drawNotStartedSubtaskLine.bind(this)
     }
 
     componentDidMount() {
@@ -127,7 +129,7 @@ class Gantt extends Component {
    */
     setupCanvas() {
     // Get a reference to the canvas object
-        var canvas = document.getElementById('gantt-canvas')
+        var canvas = document.getElementById(this.props.canvasId)
         // Create an empty project and a view for the canvas:
         paper.setup(canvas)
 
@@ -148,17 +150,31 @@ class Gantt extends Component {
         const { tasks } = this.props
 
         let yCoord = this.constants.FIRST_TASK_Y
+        // get furthest date in tasks
+        const calendarEndDate = tasks.map(t => t.endDate).sort((a, b) => a- b).filter(e => e !== undefined).reverse()[0]
+        const calendarStartDate = tasks.map(t => t.startDate).sort((a, b) => a- b).filter(e => e !== undefined)[0]
 
         for (let i = 0; i < tasks.length; i++) {
             const task = tasks[i]
-            this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, task.color)
+
+
+            if(task.startDate && task.endDate)
+                this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, task.color)
+
+            if(task.before)
+                this.drawNotStartedTaskLine(task.title, calendarEndDate, yCoord, task.color)
 
             if (task.subtasks.length) {
                 yCoord += this.constants.TASK_ARROW_HEIGHT / 2 + this.constants.TASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT / 2
 
                 for (let j = 0; j < task.subtasks.length; j++) {
                     const subtask = task.subtasks[j]
-                    this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, task.color)
+
+                    if(subtask.startDate && subtask.endDate)
+                        this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, task.color)
+
+                    if(subtask.before)
+                        this.drawNotStartedSubtaskLine(subtask.title, calendarEndDate, yCoord, task.color)
 
                     if (j !== task.subtasks.length - 1)
                         yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT
@@ -173,25 +189,22 @@ class Gantt extends Component {
 
         yCoord += this.constants.BASE_HEIGHT * 2
 
-        // get furthest date in tasks
-        const calendarEndDate = tasks.map(t => t.endDate).sort((a, b) => a- b).reverse()[0]
-        const svgSize = this.drawCalendarLine(tasks[0].startDate, calendarEndDate, yCoord)
+        console.log(calendarStartDate, calendarEndDate, tasks)
+        const svgSize = this.drawCalendarLine(calendarStartDate, calendarEndDate, yCoord)
 
         this.view.viewSize.width = svgSize.x
         this.view.viewSize.height = svgSize.y
 
 
-        // 
         this.props.getSVG(this.exportGanttToSVG())
     }
 
     exportGanttToSVG() {
         const svg = paper.project.exportSVG()
-    
-        for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
-            document.getElementsByTagName('svg')[0].remove()
+        // for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
+        //     document.getElementsByTagName('svg')[0].remove()
 
-        this.svgRange.selectNode(document.getElementById('svg'))
+        this.svgRange.selectNode(document.getElementById(this.props.svgId))
         this.svgRange.insertNode(svg)
 
         return svg
@@ -402,12 +415,24 @@ class Gantt extends Component {
         this.drawTaskArrowPoints(startDate, endDate, yCoord)
     }
 
+    drawNotStartedTaskLine(taskName, maxDate, yCoord, color) {
+        const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK, color)
+        this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(maxDate), yCoord)
+    }
+
     drawSubtaskLine(subtaskName, startDate, endDate, yCoord, color) {
         color = new paper.Color(color)
         color.alpha = this.constants.SUBTASK_COLOR_OPACITY
         this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK, color)
         const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK, color)
         this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord)
+    }
+
+    drawNotStartedSubtaskLine(subtaskName, maxDate, yCoord, color) {
+        color = new paper.Color(color)
+        color.alpha = this.constants.SUBTASK_COLOR_OPACITY
+        const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK, color)
+        this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(maxDate), yCoord)
     }
 
     drawCalendarLine(startDate, endDate, yCoord) {
@@ -421,6 +446,7 @@ class Gantt extends Component {
         const drawCalendarGraduation = () => {
 
             const deltaDays = diffInDays(startDate, endDate)
+            console.log(deltaDays, startDate, endDate)
             const pointYCoord = yCoord - this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.DATE_GRADUATION_Y_COORD
 
             let m = 0     // monday increment
@@ -555,12 +581,13 @@ class Gantt extends Component {
 
     render() {
         this.drawGanttChart()
+        const { canvasId, svgId } = this.props
 
         return (
-            <div className="gantt">
+           <div className="gantt">
                 <h1>Gantt</h1>
-                <canvas id="gantt-canvas" height={ 500 } width={ 500 } style={{ display: 'none' }}></canvas>
-                <div id="svg"></div>
+                <canvas id={ canvasId } height={ 500 } width={ 500 } style={{ display: 'none' }}></canvas>
+                <div id={ svgId }></div>
             </div>
         )
     }

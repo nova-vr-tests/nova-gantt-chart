@@ -1,601 +1,825 @@
-import React, { Component } from 'react'
-import './Gantt.css'
+import React, {Component} from "react";
+import "./Gantt.css";
+import {getDateSpread} from "../functions.js";
 
-import paper from 'paper'
+import paper from "paper";
 
 const addDays = (dat, jump) => {
-    dat.setDate(dat.getDate() + jump)
+  dat.setDate(dat.getDate() + jump);
 
-    return dat
-}
+  return dat;
+};
 
 const diffInDays = (startDate, endDate) => {
-    const diff = endDate - startDate    // milliseconds
+  const diff = endDate - startDate; // milliseconds
+  console.log("DIIF", diff, startDate, endDate);
+  if (isNaN(startDate.getDay()) || isNaN(endDate.getDate())) debugger;
 
-    return diff / (1000 * 60 * 60 * 24)
-}
+  return diff / (1000 * 60 * 60 * 24);
+};
 
 class Gantt extends Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props);
 
-        this.svgRange = document.createRange()
+    this.svgRange = document.createRange();
 
-        // Constant used to build chart elements
-        this.constants = {}
-        this.updateConstants()
+    // Constant used to build chart elements
+    this.constants = {};
+    this.updateConstants();
 
-        this.dateToXCoord = this.dateToXCoord.bind(this)
-        this.drawAllTasks = this.drawAllTasks.bind(this)
-        this.drawArrow = this.drawArrow.bind(this)
-        this.drawCalendarLine = this.drawCalendarLine.bind(this)
-        this.drawDashedLine = this.drawDashedLine.bind(this)
-        this.drawGanttChart = this.drawGanttChart.bind(this)
-        this.drawTaskArrow = this.drawTaskArrow.bind(this)
-        this.drawTaskArrowPoints = this.drawTaskArrowPoints.bind(this)
-        this.drawTaskLine = this.drawTaskLine.bind(this)
-        this.drawTaskTitle = this.drawTaskTitle.bind(this)
-        this.exportGanttToSVG = this.exportGanttToSVG.bind(this)
-        this.setupCanvas = this.setupCanvas.bind(this)
-        this.updateConstants = this.updateConstants.bind(this)
-        this.drawNotStartedTaskLine = this.drawNotStartedTaskLine.bind(this)
-        this.drawNotStartedSubtaskLine = this.drawNotStartedSubtaskLine.bind(this)
-    }
+    this.dateToXCoord = this.dateToXCoord.bind(this);
+    this.drawAllTasks = this.drawAllTasks.bind(this);
+    this.drawArrow = this.drawArrow.bind(this);
+    this.drawCalendarLine = this.drawCalendarLine.bind(this);
+    this.drawDashedLine = this.drawDashedLine.bind(this);
+    this.drawGanttChart = this.drawGanttChart.bind(this);
+    this.drawTaskArrow = this.drawTaskArrow.bind(this);
+    this.drawTaskArrowPoints = this.drawTaskArrowPoints.bind(this);
+    this.drawTaskLine = this.drawTaskLine.bind(this);
+    this.drawTaskTitle = this.drawTaskTitle.bind(this);
+    this.exportGanttToSVG = this.exportGanttToSVG.bind(this);
+    this.setupCanvas = this.setupCanvas.bind(this);
+    this.updateConstants = this.updateConstants.bind(this);
+    this.drawNotStartedTaskLine = this.drawNotStartedTaskLine.bind(this);
+    this.drawNotStartedSubtaskLine = this.drawNotStartedSubtaskLine.bind(this);
+  }
 
-    componentDidMount() {
-        this.setupCanvas()
-    }
+  componentDidMount() {
+    this.setupCanvas();
+  }
 
-    componentWillReceiveProps() {
-        this.setState({ tasks: this.props.tasks })
+  componentWillReceiveProps() {
+    this.setState({tasks: this.props.tasks});
 
-        this.drawGanttChart()
-    }
+    this.drawGanttChart();
+  }
 
-    updateConstants() {
+  updateConstants() {
     // Base dimensions
-        this.constants.BASE_HEIGHT = this.props.constants.BASE_HEIGHT || 19
-        this.constants.BASE_WIDTH = this.props.constants.BASE_WIDTH || 10
+    this.constants.BASE_HEIGHT = this.props.constants.BASE_HEIGHT || 19;
+    this.constants.BASE_WIDTH = this.props.constants.BASE_WIDTH || 10;
 
-        // Arrow dimensions
-        this.constants.TASK_ARROW_HEIGHT = 1.5 * this.constants.BASE_HEIGHT
-        this.constants.SUBTASK_ARROW_HEIGHT = 1 * this.constants.BASE_HEIGHT
-        this.constants.CALENDAR_ARROW_HEIGHT = 2 * this.constants.BASE_HEIGHT
-        this.constants.TASK_TITLE_START = 20
-        this.constants.SUBTASK_TITLE_START = 40
-        this.constants.DATE_GRADUATION_START = this.props.constants.DATE_GRADUATION_START || 350     // where date graduation starts
-        this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT
-        this.constants.CALENDAR_ARROW_POINT_DIAMETER = this.constants.TASK_ARROW_POINT_DIAMETER * 0.75
-        this.constants.CALENDAR_GRADUATION_START = 10
-        this.constants.SUBTASK_COLOR_OPACITY = 0.6
-        this.constants.TASK_TIP_LENGTH = this.props.constants.TASK_TIP_LENGTH || 45
-        this.constants.SUBTASK_TIP_LENGTH = this.props.constants.SUBTASK_TIP_LENGTH || 35
-        this.constants.TASK_ARROW_END_DATE_OFFSET = this.props.constants.TASK_ARROW_END_DATE_OFFSET || 10
+    // Arrow dimensions
+    this.constants.TASK_ARROW_HEIGHT = 1.5 * this.constants.BASE_HEIGHT;
+    this.constants.SUBTASK_ARROW_HEIGHT = 1 * this.constants.BASE_HEIGHT;
+    this.constants.CALENDAR_ARROW_HEIGHT = 2 * this.constants.BASE_HEIGHT;
+    this.constants.TASK_TITLE_START = 20;
+    this.constants.SUBTASK_TITLE_START = 40;
+    this.constants.DATE_GRADUATION_START =
+      this.props.constants.DATE_GRADUATION_START || 350; // where date graduation starts
+    this.constants.TASK_ARROW_POINT_DIAMETER = 0.4 * this.constants.BASE_HEIGHT;
+    this.constants.CALENDAR_ARROW_POINT_DIAMETER =
+      this.constants.TASK_ARROW_POINT_DIAMETER * 0.75;
+    this.constants.CALENDAR_GRADUATION_START = 10;
+    this.constants.SUBTASK_COLOR_OPACITY = 0.6;
+    this.constants.TASK_TIP_LENGTH = this.props.constants.TASK_TIP_LENGTH || 45;
+    this.constants.SUBTASK_TIP_LENGTH =
+      this.props.constants.SUBTASK_TIP_LENGTH || 35;
+    this.constants.TASK_ARROW_END_DATE_OFFSET =
+      this.props.constants.TASK_ARROW_END_DATE_OFFSET || 10;
 
-        // Colors
-        this.constants.CALENDAR_BG_COLOR = '#CCCABC'
-        this.constants.CALENDAR_TEXT_COLOR = '#999999'
+    // Colors
+    this.constants.CALENDAR_BG_COLOR = "#CCCABC";
+    this.constants.CALENDAR_TEXT_COLOR = "#999999";
 
+    // Spaces beween tasks
+    this.constants.TASK_INTERLINE = 1 * this.constants.BASE_HEIGHT;
+    this.constants.SUBTASK_INTERLINE = 0.5 * this.constants.BASE_HEIGHT;
 
-        // Spaces beween tasks
-        this.constants.TASK_INTERLINE = 1 * this.constants.BASE_HEIGHT
-        this.constants.SUBTASK_INTERLINE = 0.5 * this.constants.BASE_HEIGHT
+    // Fonts
+    this.constants.TASK_FONT_SIZE = this.props.constants.TASK_FONT_SIZE || 18;
+    this.constants.SUBTASK_FONT_SIZE =
+      this.props.constants.SUBTASK_FONT_SIZE || 14;
+    this.constants.CALENDAR_GRADUATION_FONT_SIZE =
+      this.props.constants.CALENDAR_GRADUATION_FONT_SIZE || 10;
 
-        // Fonts
-        this.constants.TASK_FONT_SIZE = this.props.constants.TASK_FONT_SIZE || 18
-        this.constants.SUBTASK_FONT_SIZE = this.props.constants.SUBTASK_FONT_SIZE || 14
-        this.constants.CALENDAR_GRADUATION_FONT_SIZE = this.props.constants.CALENDAR_GRADUATION_FONT_SIZE || 10
+    this.constants.FONT_FAMILY = "Courier New";
+    (this.constants.FONT_STROKE_WIDTH = 0.4),
+      // Task title coords
+      (this.constants.TASK_TITLE_START_OFFSET = {
+        x: this.constants.TASK_ARROW_HEIGHT / 0.75,
+        y: this.constants.TASK_FONT_SIZE / 2.5,
+      });
 
-        this.constants.FONT_FAMILY = 'Courier New'
-        this.constants.FONT_STROKE_WIDTH = 0.4,
+    this.constants.SUBTASK_TITLE_START_OFFSET = {
+      x: this.constants.SUBTASK_ARROW_HEIGHT / 0.75,
+      y: this.constants.SUBTASK_FONT_SIZE / 2.5,
+    };
 
-        // Task title coords
-        this.constants.TASK_TITLE_START_OFFSET = {
-            x: this.constants.TASK_ARROW_HEIGHT / 0.75,
-            y: this.constants.TASK_FONT_SIZE / 2.5,
-        }
+    // Line type
+    this.constants.TASK = 0;
+    this.constants.SUBTASK = 1;
+    this.constants.CALENDAR = 2;
 
-        this.constants.SUBTASK_TITLE_START_OFFSET = {
-            x: this.constants.SUBTASK_ARROW_HEIGHT / 0.75,
-            y: this.constants.SUBTASK_FONT_SIZE / 2.5,
-        }
+    // Date constants
+    //this.constants.START_DATE = new Date(this.props.tasks[0].startDate);
+    this.constants.START_DATE = new Date(
+      getDateSpread(this.props.tasks).minDate,
+    );
 
-        // Line type
-        this.constants.TASK = 0
-        this.constants.SUBTASK = 1
-        this.constants.CALENDAR = 2
+    // Other constants
+    this.constants.FIRST_TASK_Y = 50;
+    this.constants.TEXT_OPACITY = 0.5;
+    this.constants.TEXT_COLOR_OPACITY = new paper.Color(
+      255,
+      255,
+      255,
+      this.constants.TEXT_OPACITY,
+    );
+    this.constants.TEXT_COLOR = "white";
+    this.constants.DATE_GRADUATION_Y_COORD =
+      (this.constants.CALENDAR_ARROW_HEIGHT / 2) * 0.75;
+    this.constants.CALENDAR_POINTS_BEFORE_START = 10;
+    this.constants.CALENDAR_POINTS_AFTER_END = 0;
+    this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8;
+    this.constants.CALENDAR_MONTH_FONT_SIZE = 12;
+    this.constants.CALENDAR_YEAR_FONT_SIZE = 18;
 
+    this.view = paper.view;
+  }
 
-        // Date constants
-        this.constants.START_DATE = new Date(this.props.tasks[0].startDate)
-
-        // Other constants
-        this.constants.FIRST_TASK_Y = 50
-        this.constants.TEXT_OPACITY = 0.5
-        this.constants.TEXT_COLOR_OPACITY = new paper.Color(255, 255, 255, this.constants.TEXT_OPACITY)
-        this.constants.TEXT_COLOR = 'white'
-        this.constants.DATE_GRADUATION_Y_COORD = this.constants.CALENDAR_ARROW_HEIGHT / 2 * 0.75
-        this.constants.CALENDAR_POINTS_BEFORE_START = 10
-        this.constants.CALENDAR_POINTS_AFTER_END = 0
-        this.constants.CALENDAR_MONTH_MARK_HEIGHT = 8
-        this.constants.CALENDAR_MONTH_FONT_SIZE = 12
-        this.constants.CALENDAR_YEAR_FONT_SIZE = 18
-
-        this.view = paper.view
-    }
-
-    /**
+  /**
    * Sets up the canvas to draw Gantt
    */
-    setupCanvas() {
+  setupCanvas() {
     // Get a reference to the canvas object
-        var canvas = document.getElementById(this.props.canvasId)
-        // Create an empty project and a view for the canvas:
-        paper.setup(canvas)
+    var canvas = document.getElementById(this.props.canvasId);
+    // Create an empty project and a view for the canvas:
+    paper.setup(canvas);
 
-        this.drawAllTasks()
+    this.drawAllTasks();
+  }
+
+  drawGanttChart() {
+    if (paper.project) {
+      paper.project.clear();
+
+      this.drawAllTasks();
     }
+  }
 
-    drawGanttChart() {
-        if(paper.project) {
-            paper.project.clear()
+  drawAllTasks() {
+    this.updateConstants();
 
-            this.drawAllTasks()
+    const {tasks} = this.props;
+
+    let yCoord = this.constants.FIRST_TASK_Y;
+    // get furthest date in tasks
+    const calendarEndDate = tasks
+      .map(t => t.endDate)
+      .sort((a, b) => a - b)
+      .filter(e => e !== undefined)
+      .reverse()[0];
+    const calendarStartDate = tasks
+      .map(t => t.startDate)
+      .sort((a, b) => a - b)
+      .filter(e => e !== undefined)[0];
+
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
+
+      if (task.startDate && task.endDate)
+        this.drawTaskLine(
+          task.title,
+          task.startDate,
+          task.endDate,
+          yCoord,
+          task.color,
+        );
+
+      if (task.before)
+        this.drawNotStartedTaskLine(
+          task.title,
+          calendarEndDate,
+          yCoord,
+          task.color,
+        );
+
+      if (task.subtasks.length) {
+        yCoord +=
+          this.constants.TASK_ARROW_HEIGHT / 2 +
+          this.constants.TASK_INTERLINE +
+          this.constants.SUBTASK_ARROW_HEIGHT / 2;
+
+        for (let j = 0; j < task.subtasks.length; j++) {
+          const subtask = task.subtasks[j];
+
+          if (subtask.startDate && subtask.endDate)
+            this.drawSubtaskLine(
+              subtask.title,
+              subtask.startDate,
+              subtask.endDate,
+              yCoord,
+              task.color,
+            );
+
+          if (subtask.before)
+            this.drawNotStartedSubtaskLine(
+              subtask.title,
+              calendarEndDate,
+              yCoord,
+              task.color,
+            );
+
+          if (j !== task.subtasks.length - 1)
+            yCoord +=
+              this.constants.SUBTASK_INTERLINE +
+              this.constants.SUBTASK_ARROW_HEIGHT;
         }
+
+        yCoord +=
+          this.constants.SUBTASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2;
+      } else {
+        yCoord +=
+          this.constants.TASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2;
+      }
     }
 
-    drawAllTasks() {
-        this.updateConstants()
+    yCoord += this.constants.BASE_HEIGHT * 2;
 
-        const { tasks } = this.props
+    const svgSize = this.drawCalendarLine(
+      calendarStartDate,
+      calendarEndDate,
+      yCoord,
+    );
 
-        let yCoord = this.constants.FIRST_TASK_Y
-        // get furthest date in tasks
-        const calendarEndDate = tasks.map(t => t.endDate).sort((a, b) => a- b).filter(e => e !== undefined).reverse()[0]
-        const calendarStartDate = tasks.map(t => t.startDate).sort((a, b) => a- b).filter(e => e !== undefined)[0]
+    this.view.viewSize.width = svgSize.x;
+    this.view.viewSize.height = svgSize.y;
 
-        for (let i = 0; i < tasks.length; i++) {
-            const task = tasks[i]
+    this.props.getSVG(this.exportGanttToSVG());
+  }
 
+  exportGanttToSVG() {
+    const svg = paper.project.exportSVG();
+    // for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
+    //     document.getElementsByTagName('svg')[0].remove()
 
-            if(task.startDate && task.endDate)
-                this.drawTaskLine(task.title, task.startDate, task.endDate, yCoord, task.color)
+    this.svgRange.selectNode(document.getElementById(this.props.svgId));
+    this.svgRange.insertNode(svg);
 
-            if(task.before)
-                this.drawNotStartedTaskLine(task.title, calendarEndDate, yCoord, task.color)
+    return svg;
+  }
 
-            if (task.subtasks.length) {
-                yCoord += this.constants.TASK_ARROW_HEIGHT / 2 + this.constants.TASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT / 2
-
-                for (let j = 0; j < task.subtasks.length; j++) {
-                    const subtask = task.subtasks[j]
-
-                    if(subtask.startDate && subtask.endDate)
-                        this.drawSubtaskLine(subtask.title, subtask.startDate, subtask.endDate, yCoord, task.color)
-
-                    if(subtask.before)
-                        this.drawNotStartedSubtaskLine(subtask.title, calendarEndDate, yCoord, task.color)
-
-                    if (j !== task.subtasks.length - 1)
-                        yCoord += this.constants.SUBTASK_INTERLINE + this.constants.SUBTASK_ARROW_HEIGHT
-                }
-
-                yCoord += this.constants.SUBTASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2
-            } else {
-
-                yCoord += this.constants.TASK_ARROW_HEIGHT + this.constants.BASE_HEIGHT * 2
-            }
-        }
-
-        yCoord += this.constants.BASE_HEIGHT * 2
-
-        console.log(calendarStartDate, calendarEndDate, tasks)
-        const svgSize = this.drawCalendarLine(calendarStartDate, calendarEndDate, yCoord)
-
-        this.view.viewSize.width = svgSize.x
-        this.view.viewSize.height = svgSize.y
-
-
-        this.props.getSVG(this.exportGanttToSVG())
-    }
-
-    exportGanttToSVG() {
-        const svg = paper.project.exportSVG()
-        // for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
-        //     document.getElementsByTagName('svg')[0].remove()
-
-        this.svgRange.selectNode(document.getElementById(this.props.svgId))
-        this.svgRange.insertNode(svg)
-
-        return svg
-    }
-
-    /**
+  /**
    * Converts date to canvas x-coordinatec
    * @param {object} date Date object to convert to x-coordinate on canvas
    * @returns {number} X-coordinate of input date to return
    */
-    dateToXCoord(date) {
-        const xcoord = diffInDays(this.constants.START_DATE, date) * this.constants.BASE_WIDTH + this.constants.DATE_GRADUATION_START
+  dateToXCoord(date) {
+    console.log("ERROR HERE", date);
+    const xcoord =
+      diffInDays(this.constants.START_DATE, date) * this.constants.BASE_WIDTH +
+      this.constants.DATE_GRADUATION_START;
+    console.log("ERROR HERE AFTER", xcoord);
+    if (!xcoord) return 1000;
 
-        return xcoord
+    return xcoord;
+  }
+
+  drawArrow(xStart, xEnd, yCoord, taskType, color, isFilled = true) {
+    console.log("HELLO", xStart, xEnd, yCoord, taskType, color, isFilled);
+    let ARROW_HEIGHT = 0;
+    let tipAnchorLength = 0;
+    let opacity = 1;
+    if (taskType === this.constants.TASK) {
+      ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
+      tipAnchorLength = 0.75 * this.constants.BASE_WIDTH;
+    } else if (taskType === this.constants.SUBTASK) {
+      ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
+      tipAnchorLength = 0.5 * this.constants.BASE_WIDTH;
+      opacity = this.constants.SUBTASK_COLOR_OPACITY;
+    } else if (taskType === this.constants.CALENDAR) {
+      ARROW_HEIGHT = this.constants.CALENDAR_ARROW_HEIGHT;
+      tipAnchorLength = 1.0 * this.constants.BASE_WIDTH;
     }
 
-    drawArrow(xStart, xEnd, yCoord, taskType, color, isFilled = true) {
-        let ARROW_HEIGHT = 0
-        let tipAnchorLength = 0
-        let opacity = 1
-        if (taskType === this.constants.TASK) {
-            ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT
-            tipAnchorLength = 0.75 * this.constants.BASE_WIDTH
-        } else if (taskType === this.constants.SUBTASK) {
-            ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT
-            tipAnchorLength = 0.5 * this.constants.BASE_WIDTH
-            opacity = this.constants.SUBTASK_COLOR_OPACITY
-        } else if (taskType === this.constants.CALENDAR) {
-            ARROW_HEIGHT = this.constants.CALENDAR_ARROW_HEIGHT
-            tipAnchorLength = 1.0 * this.constants.BASE_WIDTH
-        }
+    let endPoint = new paper.Point(xEnd, yCoord);
 
-        let endPoint = new paper.Point(xEnd, yCoord)
+    const arrow = new paper.Path(
+      // Bottom arc
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2),
+        null,
+        new paper.Point((-0.55228 * ARROW_HEIGHT) / 2, 0),
+      ),
+      new paper.Segment(
+        new paper.Point(xStart, yCoord),
+        new paper.Point(0, (0.55228 * ARROW_HEIGHT) / 2),
+        null,
+      ),
+      // Top arc
+      new paper.Segment(
+        new paper.Point(xStart, yCoord),
+        null,
+        new paper.Point(0, (-0.55228 * ARROW_HEIGHT) / 2),
+      ),
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2),
+        new paper.Point((-0.55228 * ARROW_HEIGHT) / 2, 0),
+        null,
+      ),
+      // Top line
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2),
+      ),
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
+      ),
+      // Top arrow tip
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
+        null,
+        new paper.Point(tipAnchorLength, 0),
+      ),
+      new paper.Segment(endPoint, null, null),
+      // Bottom arrow tip
+      new paper.Segment(endPoint, null, null),
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
+        new paper.Point(tipAnchorLength, 0),
+        null,
+      ),
+      // Bottom line
+      new paper.Segment(
+        new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
+      ),
+      new paper.Segment(
+        new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2),
+      ),
+    );
 
+    arrow.strokeColor = color;
+    arrow.opacity = opacity;
 
-        const arrow = new paper.Path(
-            // Bottom arc 
-            new paper.Segment(
-                new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2),
-                null,
-                new paper.Point(-0.55228 * ARROW_HEIGHT / 2, 0)
-            ),
-            new paper.Segment(
-                new paper.Point(xStart, yCoord),
-                new paper.Point(0, 0.55228 * ARROW_HEIGHT / 2),
-                null
-            ),
-            // Top arc
-            new paper.Segment(
-                new paper.Point(xStart, yCoord),
-                null,
-                new paper.Point(0, -0.55228 * ARROW_HEIGHT / 2)
-            ),
-            new paper.Segment(
-                new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2),
-                new paper.Point(-0.55228 * ARROW_HEIGHT / 2, 0),
-                null
-            ),
-            // Top line
-            new paper.Segment(
-                new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord - ARROW_HEIGHT / 2)
-            ),
-            new paper.Segment(
-                new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2)
-            ),
-            // Top arrow tip
-            new paper.Segment(
-                new paper.Point(xEnd - ARROW_HEIGHT, yCoord - ARROW_HEIGHT / 2),
-                null,
-                new paper.Point(tipAnchorLength, 0)
-            ),
-            new paper.Segment(
-                endPoint,
-                null,
-                null
-            ),
-            // Bottom arrow tip
-            new paper.Segment(
-                endPoint,
-                null,
-                null
-            ),
-            new paper.Segment(
-                new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2),
-                new paper.Point(tipAnchorLength, 0),
-                null
-            ),
-            // Bottom line
-            new paper.Segment(
-                new paper.Point(xEnd - ARROW_HEIGHT, yCoord + ARROW_HEIGHT / 2)
-            ),
-            new paper.Segment(
-                new paper.Point(xStart + ARROW_HEIGHT / 2, yCoord + ARROW_HEIGHT / 2)
-            )
-        )
+    if (isFilled) arrow.fillColor = color;
 
-        arrow.strokeColor = color
-        arrow.opacity = opacity
+    return endPoint;
+  }
 
-        if (isFilled)
-            arrow.fillColor = color
-
-
-        return endPoint
-    }
-
-    /**
+  /**
    * Returns an arrow associated with a task with given duration
    * @param {object} startDate Arrow start date
    * @param {object} endDate Arrow end date
    * @param {number} yCoord Y-coordinate of arrow midline
    */
-    drawTaskArrow(startDate, endDate, yCoord, taskType, color) {
-        this.drawArrow(this.dateToXCoord(startDate), this.dateToXCoord(endDate), yCoord, taskType, color)
+  drawTaskArrow(startDate, endDate, yCoord, taskType, color) {
+    console.log("ITS ALSO ME", startDate, endDate);
+    console.log(
+      "ITS ME",
+      this.dateToXCoord(startDate),
+      this.dateToXCoord(endDate),
+    );
+    this.drawArrow(
+      this.dateToXCoord(startDate),
+      this.dateToXCoord(endDate),
+      yCoord,
+      taskType,
+      color,
+    );
+  }
+
+  drawTaskTitle(title, yCoord, taskType = this.constants.TASK, color) {
+    let ARROW_HEIGHT, ARROW_START, TEXT_START, FONT_SIZE, TIP_LENGTH;
+    const TITLE_PADDING_RIGHT = 10; // px
+
+    if (taskType === this.constants.TASK) {
+      ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT;
+      ARROW_START = this.constants.TASK_TITLE_START;
+      TEXT_START = this.constants.TASK_TITLE_START_OFFSET;
+      FONT_SIZE = this.constants.TASK_FONT_SIZE;
+      TIP_LENGTH = this.constants.TASK_TIP_LENGTH;
+    } else {
+      ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT;
+      ARROW_START = this.constants.SUBTASK_TITLE_START;
+      TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET;
+      FONT_SIZE = this.constants.SUBTASK_FONT_SIZE;
+      TIP_LENGTH = this.constants.SUBTASK_TIP_LENGTH;
     }
 
-    drawTaskTitle(title, yCoord, taskType = this.constants.TASK, color) {
-        let ARROW_HEIGHT, ARROW_START, TEXT_START, FONT_SIZE, TIP_LENGTH
-        const TITLE_PADDING_RIGHT = 10 // px
+    const text = new paper.PointText(
+      ARROW_START + TEXT_START.x,
+      yCoord + TEXT_START.y,
+    );
+    text.content = title;
+    text.fontSize = FONT_SIZE;
 
-        if (taskType === this.constants.TASK) {
-            ARROW_HEIGHT = this.constants.TASK_ARROW_HEIGHT
-            ARROW_START = this.constants.TASK_TITLE_START
-            TEXT_START = this.constants.TASK_TITLE_START_OFFSET
-            FONT_SIZE = this.constants.TASK_FONT_SIZE
-            TIP_LENGTH = this.constants.TASK_TIP_LENGTH
+    const ARROW_END =
+      ARROW_START +
+      text.bounds.right -
+      text.bounds.left +
+      ARROW_HEIGHT / 2 +
+      TIP_LENGTH +
+      TITLE_PADDING_RIGHT;
+
+    const arrowEndPoint = this.drawArrow(
+      ARROW_START,
+      ARROW_END,
+      yCoord,
+      taskType,
+      color,
+      false,
+    );
+    const circle = paper.Path.Circle(
+      new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord),
+      ARROW_HEIGHT / 2,
+    );
+    circle.fillColor = color;
+
+    if (taskType === this.constants.TASK) {
+      text.strokeColor = color;
+      text.fontFamily = this.constants.FONT_FAMILY;
+      text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+    } else {
+      text.strokeColor = color;
+      text.fontFamily = this.constants.FONT_FAMILY;
+      text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+    }
+
+    text.fillColor = color;
+
+    return arrowEndPoint;
+  }
+
+  drawDashedLine(xStart, xEnd, yCoord) {
+    const line = paper.Path.Line(
+      new paper.Point(xStart, yCoord),
+      new paper.Point(xEnd, yCoord),
+    );
+    line.strokeColor = "black";
+    line.dashArray = [2, 3];
+    line.opacity = 0.5;
+  }
+
+  drawTaskArrowPoints(startDate, endDate, yCoord) {
+    const points = [];
+    const numPoints = Math.floor(diffInDays(startDate, endDate) / 7);
+
+    for (let i = 0; i <= numPoints; i++) {
+      if (i === 0) {
+        const text = new paper.PointText(
+          new paper.Point(
+            this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2,
+            yCoord +
+              (this.constants.TASK_ARROW_HEIGHT -
+                this.constants.TASK_FONT_SIZE) /
+                2,
+          ),
+        );
+        text.strokeColor = this.constants.TEXT_COLOR;
+        text.fontFamily = this.constants.FONT_FAMILY;
+        text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+        text.fontSize = this.constants.TASK_FONT_SIZE;
+        // text.content = addDays(startDate, 1).getDate();
+        text.content =
+          (addDays(startDate, 1).getDate() + "").length < 2
+            ? "0" + startDate.getDate()
+            : startDate.getDate();
+        text.fillColor = this.constants.TEXT_COLOR;
+      } else if (i === numPoints) {
+        const text = new paper.PointText(
+          new paper.Point(
+            this.dateToXCoord(endDate) -
+              this.constants.BASE_WIDTH -
+              this.constants.TASK_ARROW_HEIGHT / 2 -
+              this.constants.TASK_ARROW_END_DATE_OFFSET,
+            yCoord +
+              (this.constants.TASK_ARROW_HEIGHT -
+                this.constants.TASK_FONT_SIZE) /
+                2,
+          ),
+        );
+        text.strokeColor = this.constants.TEXT_COLOR;
+        text.fontFamily = this.constants.FONT_FAMILY;
+        text.fontSize = this.constants.TASK_FONT_SIZE;
+        text.strokeWidth = this.constants.FONT_STROKE_WIDTH;
+        text.content =
+          (addDays(endDate, -1).getDate() + "").length < 2
+            ? "0" + endDate.getDate()
+            : endDate.getDate();
+        text.fillColor = this.constants.TEXT_COLOR;
+      } else {
+        points[i] = new paper.Path.Circle(
+          new paper.Point(
+            this.dateToXCoord(startDate) +
+              i * 7 * this.constants.BASE_WIDTH +
+              this.constants.TASK_ARROW_HEIGHT / 2,
+            yCoord,
+          ),
+          this.constants.TASK_ARROW_POINT_DIAMETER / 2,
+        );
+
+        points[i].fillColor = this.constants.TEXT_COLOR_OPACITY;
+      }
+    }
+  }
+
+  drawTaskLine(taskName, startDate, endDate, yCoord, color) {
+    this.drawTaskArrow(
+      addDays(startDate, -1),
+      addDays(endDate, +1),
+      yCoord,
+      this.constants.TASK,
+      color,
+    );
+    const taskTitleArrowEndPoint = this.drawTaskTitle(
+      taskName,
+      yCoord,
+      this.constants.TASK,
+      color,
+    );
+    this.drawDashedLine(
+      taskTitleArrowEndPoint.x,
+      this.dateToXCoord(startDate),
+      yCoord,
+    );
+    this.drawTaskArrowPoints(startDate, endDate, yCoord);
+  }
+
+  drawNotStartedTaskLine(taskName, maxDate, yCoord, color) {
+    const taskTitleArrowEndPoint = this.drawTaskTitle(
+      taskName,
+      yCoord,
+      this.constants.TASK,
+      color,
+    );
+    this.drawDashedLine(
+      taskTitleArrowEndPoint.x,
+      this.dateToXCoord(maxDate),
+      yCoord,
+    );
+  }
+
+  drawSubtaskLine(subtaskName, startDate, endDate, yCoord, color) {
+    color = new paper.Color(color);
+    color.alpha = this.constants.SUBTASK_COLOR_OPACITY;
+    this.drawTaskArrow(
+      startDate,
+      endDate,
+      yCoord,
+      this.constants.SUBTASK,
+      color,
+    );
+    const taskTitleArrowEndPoint = this.drawTaskTitle(
+      subtaskName,
+      yCoord,
+      this.constants.SUBTASK,
+      color,
+    );
+    this.drawDashedLine(
+      taskTitleArrowEndPoint.x,
+      this.dateToXCoord(startDate),
+      yCoord,
+    );
+  }
+
+  drawNotStartedSubtaskLine(subtaskName, maxDate, yCoord, color) {
+    color = new paper.Color(color);
+    color.alpha = this.constants.SUBTASK_COLOR_OPACITY;
+    const taskTitleArrowEndPoint = this.drawTaskTitle(
+      subtaskName,
+      yCoord,
+      this.constants.SUBTASK,
+      color,
+    );
+    this.drawDashedLine(
+      taskTitleArrowEndPoint.x,
+      this.dateToXCoord(maxDate),
+      yCoord,
+    );
+  }
+
+  drawCalendarLine(startDate, endDate, yCoord) {
+    const endPoint = this.drawArrow(
+      this.constants.TASK_TITLE_START,
+      this.dateToXCoord(endDate) + 4 * this.constants.BASE_WIDTH,
+      yCoord,
+      this.constants.CALENDAR,
+      this.constants.CALENDAR_BG_COLOR,
+    );
+
+    const points = [];
+    const mondays = [];
+    const monthGraduation = [];
+    let year;
+    const months = [];
+    const drawCalendarGraduation = () => {
+      const deltaDays = diffInDays(startDate, endDate);
+      console.log(deltaDays, startDate, endDate);
+      const pointYCoord =
+        yCoord -
+        this.constants.CALENDAR_ARROW_HEIGHT / 2 +
+        this.constants.DATE_GRADUATION_Y_COORD;
+
+      let m = 0; // monday increment
+      const date_m = new Date(startDate);
+      let j = 0; // months increment
+      const i_0 = -this.constants.CALENDAR_POINTS_BEFORE_START;
+      addDays(date_m, -this.constants.CALENDAR_POINTS_BEFORE_START);
+      for (
+        let i = i_0;
+        i < deltaDays + this.constants.CALENDAR_POINTS_AFTER_END;
+        i++
+      ) {
+        const x =
+          this.constants.DATE_GRADUATION_START + i * this.constants.BASE_WIDTH;
+
+        // Write year on first graduation
+        if (i === i_0) {
+          year = new paper.PointText(
+            new paper.Point(
+              x,
+              yCoord +
+                this.constants.CALENDAR_ARROW_HEIGHT / 2 +
+                this.constants.CALENDAR_YEAR_FONT_SIZE / 2.5,
+            ),
+          );
+
+          year.fontSize = this.constants.CALENDAR_YEAR_FONT_SIZE;
+          year.fillColor = new paper.Color(0, 0, 0, 0.5);
+          year.strokeWidth = 1;
+          year.content = date_m.getFullYear();
+          year.translate(
+            new paper.Point(-(year.bounds.right - year.bounds.left), 0),
+          );
+        }
+
+        // Show point of not Monday
+        if (date_m.getDay() !== 1) {
+          points[i] = new paper.Path.Circle(
+            new paper.Point(x, pointYCoord),
+            this.constants.CALENDAR_ARROW_POINT_DIAMETER / 2,
+          );
+
+          points[i].fillColor = "black";
+          points[i].opacity = this.constants.TEXT_OPACITY;
         } else {
-            ARROW_HEIGHT = this.constants.SUBTASK_ARROW_HEIGHT
-            ARROW_START = this.constants.SUBTASK_TITLE_START
-            TEXT_START = this.constants.SUBTASK_TITLE_START_OFFSET
-            FONT_SIZE = this.constants.SUBTASK_FONT_SIZE
-            TIP_LENGTH = this.constants.SUBTASK_TIP_LENGTH
+          mondays[m] = new paper.PointText(
+            new paper.Point(
+              x - this.constants.CALENDAR_GRADUATION_FONT_SIZE / 1.5,
+              yCoord,
+            ),
+          );
+          mondays[m].content =
+            (date_m.getDate() + "").length < 2
+              ? "0" + date_m.getDate()
+              : date_m.getDate();
+          mondays[m].fillColor = "black";
+          mondays[m].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE;
+          mondays[m].strokeWidth = 1;
+          mondays[m].opacity = this.constants.TEXT_OPACITY;
+
+          m++;
         }
 
-        const text = new paper.PointText(ARROW_START + TEXT_START.x, yCoord + TEXT_START.y)
-        text.content = title
-        text.fontSize = FONT_SIZE
+        if (date_m.getDate() === 1 && date_m >= startDate) {
+          monthGraduation[j] = new paper.Path.Line(
+            new paper.Point(
+              x,
+              yCoord +
+                this.constants.CALENDAR_ARROW_HEIGHT / 2 -
+                this.constants.CALENDAR_MONTH_MARK_HEIGHT / 2,
+            ),
+            new paper.Point(
+              x,
+              yCoord +
+                this.constants.CALENDAR_ARROW_HEIGHT / 2 +
+                this.constants.CALENDAR_MONTH_MARK_HEIGHT / 2,
+            ),
+          );
 
-        const ARROW_END = ARROW_START + text.bounds.right - text.bounds.left + ARROW_HEIGHT / 2 + TIP_LENGTH + TITLE_PADDING_RIGHT
+          monthGraduation[j].strokeColor = "black";
+          monthGraduation[j].strokeWidth = 3;
+          monthGraduation[j].opacity = this.constants.TEXT_OPACITY;
+          monthGraduation[j].strokeCap = "round";
 
-        const arrowEndPoint = this.drawArrow(ARROW_START, ARROW_END, yCoord, taskType, color, false)
-        const circle = paper.Path.Circle(new paper.Point(ARROW_START + ARROW_HEIGHT / 2, yCoord), ARROW_HEIGHT / 2)
-        circle.fillColor = color
+          j++;
+        }
 
+        addDays(date_m, 1);
+      }
+    };
 
-        if (taskType === this.constants.TASK) {
-            text.strokeColor = color
-            text.fontFamily = this.constants.FONT_FAMILY
-            text.strokeWidth = this.constants.FONT_STROKE_WIDTH
+    const drawMonths = () => {
+      const monthsNames = [
+        "January",
+        "Febuary",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "Septembre",
+        "October",
+        "November",
+        "December",
+      ];
+
+      // Show first month
+      const n = startDate.getMonth(); // Start month number
+      for (let i = 0; i < monthGraduation.length + 1; i++) {
+        months[i] = new paper.PointText(
+          year.bounds.right + 1 * this.constants.BASE_WIDTH,
+          yCoord +
+            this.constants.CALENDAR_ARROW_HEIGHT / 2.5 +
+            this.constants.CALENDAR_MONTH_FONT_SIZE / 2,
+        );
+        const m = n + i; // Current month number
+        months[i].content = monthsNames[m % 12 ? m % 12 : 11];
+        months[i].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE + 2;
+
+        if (i === 0) {
+          if (months[i].bounds.right < monthGraduation[0].bounds.left) {
+            months[i].fillColor = "black";
+            months[i].opacity = 0.5;
+            months[i].strokeWidth = 1;
+          } else {
+            months[i].opacity = 0;
+          }
+        } else if (i === monthGraduation.length) {
+          if (
+            this.dateToXCoord(endDate) -
+              (months[i].bounds.right - months[i].bounds.left) / 2 >
+            monthGraduation[i - 1].bounds.right
+          ) {
+            months[i].fillColor = "black";
+            months[i].opacity = 0.5;
+            months[i].strokeWidth = 1;
+            const translateX =
+              this.dateToXCoord(endDate) - months[i].bounds.right;
+            months[i].translate(new paper.Point(translateX, 0));
+          } else {
+            months[i].opacity = 0;
+          }
         } else {
-            text.strokeColor = color
-            text.fontFamily = this.constants.FONT_FAMILY
-            text.strokeWidth = this.constants.FONT_STROKE_WIDTH
+          // center month
+          months[i].fillColor = "black";
+          months[i].opacity = 0.5;
+          months[i].strokeWidth = 1;
+
+          const midPt = (months[i].bounds.right - months[i].bounds.left) / 2;
+          const midPt_prime =
+            monthGraduation[i - 1].bounds.left +
+            (monthGraduation[i].bounds.left -
+              monthGraduation[i - 1].bounds.right) /
+              2 -
+            months[0].bounds.left;
+          const delta = midPt_prime - midPt;
+          months[i].translate(new paper.Point(delta, 0));
         }
+      }
+    };
 
-        text.fillColor = color
+    const drawLogo = () => {
+      const logo = new paper.Path.Circle(
+        new paper.Point(
+          this.constants.TASK_TITLE_START +
+            this.constants.CALENDAR_ARROW_HEIGHT / 2,
+          yCoord,
+        ),
+        this.constants.TASK_ARROW_HEIGHT / 2,
+      );
+      logo.fillColor = "black";
+      logo.opacity = this.constants.TEXT_OPACITY;
+    };
 
+    drawCalendarGraduation();
+    drawMonths();
+    drawLogo();
 
-        return arrowEndPoint
-    }
+    // Calendar arrow defines SVG's furthest coordinates
+    // We use this to infer the SVG framing
+    const svgSize = {
+      x: endPoint.x + this.constants.TASK_TITLE_START,
+      y: year.bounds.bottom + this.constants.TASK_TITLE_START,
+    };
 
-    drawDashedLine(xStart, xEnd, yCoord) {
-        const line = paper.Path.Line(new paper.Point(xStart, yCoord), new paper.Point(xEnd, yCoord))
-        line.strokeColor = 'black'
-        line.dashArray = [2, 3]
-        line.opacity = 0.5
-    }
+    return svgSize;
+  }
 
-    drawTaskArrowPoints(startDate, endDate, yCoord) {
-        const points = []
-        const numPoints = Math.floor(diffInDays(startDate, endDate) / 7)
+  render() {
+    this.drawGanttChart();
+    const {canvasId, svgId} = this.props;
 
-        for (let i = 0; i <= numPoints; i++) {
-            if (i === 0) {
-                const text = new paper.PointText(new paper.Point(this.dateToXCoord(startDate) + this.constants.TASK_ARROW_HEIGHT / 2, yCoord + (this.constants.TASK_ARROW_HEIGHT - this.constants.TASK_FONT_SIZE) / 2))
-                text.strokeColor = this.constants.TEXT_COLOR
-                text.fontFamily = this.constants.FONT_FAMILY
-                text.strokeWidth = this.constants.FONT_STROKE_WIDTH
-                text.fontSize = this.constants.TASK_FONT_SIZE
-                // text.content = addDays(startDate, 1).getDate();
-                text.content = (addDays(startDate, 1).getDate() + '').length < 2 ? '0' + startDate.getDate() : startDate.getDate()
-                text.fillColor = this.constants.TEXT_COLOR
-            } else if (i === numPoints) {
-                const text = new paper.PointText(new paper.Point(this.dateToXCoord(endDate) - this.constants.BASE_WIDTH - this.constants.TASK_ARROW_HEIGHT / 2 - this.constants.TASK_ARROW_END_DATE_OFFSET, yCoord + (this.constants.TASK_ARROW_HEIGHT - this.constants.TASK_FONT_SIZE) / 2))
-                text.strokeColor = this.constants.TEXT_COLOR
-                text.fontFamily = this.constants.FONT_FAMILY
-                text.fontSize = this.constants.TASK_FONT_SIZE
-                text.strokeWidth = this.constants.FONT_STROKE_WIDTH
-                text.content = (addDays(endDate, -1).getDate() + '').length < 2 ? '0' + endDate.getDate() : endDate.getDate()
-                text.fillColor = this.constants.TEXT_COLOR
-            } else {
-                points[i] = new paper.Path.Circle(
-                    new paper.Point(this.dateToXCoord(startDate) + i * 7 * this.constants.BASE_WIDTH + this.constants.TASK_ARROW_HEIGHT / 2, yCoord),
-                    this.constants.TASK_ARROW_POINT_DIAMETER / 2
-                )
-
-                points[i].fillColor = this.constants.TEXT_COLOR_OPACITY
-            }
-
-
-        }
-    }
-
-    drawTaskLine(taskName, startDate, endDate, yCoord, color) {
-        this.drawTaskArrow(addDays(startDate, -1), addDays(endDate, +1), yCoord, this.constants.TASK, color)
-        const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK, color)
-        this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord)
-        this.drawTaskArrowPoints(startDate, endDate, yCoord)
-    }
-
-    drawNotStartedTaskLine(taskName, maxDate, yCoord, color) {
-        const taskTitleArrowEndPoint = this.drawTaskTitle(taskName, yCoord, this.constants.TASK, color)
-        this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(maxDate), yCoord)
-    }
-
-    drawSubtaskLine(subtaskName, startDate, endDate, yCoord, color) {
-        color = new paper.Color(color)
-        color.alpha = this.constants.SUBTASK_COLOR_OPACITY
-        this.drawTaskArrow(startDate, endDate, yCoord, this.constants.SUBTASK, color)
-        const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK, color)
-        this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(startDate), yCoord)
-    }
-
-    drawNotStartedSubtaskLine(subtaskName, maxDate, yCoord, color) {
-        color = new paper.Color(color)
-        color.alpha = this.constants.SUBTASK_COLOR_OPACITY
-        const taskTitleArrowEndPoint = this.drawTaskTitle(subtaskName, yCoord, this.constants.SUBTASK, color)
-        this.drawDashedLine(taskTitleArrowEndPoint.x, this.dateToXCoord(maxDate), yCoord)
-    }
-
-    drawCalendarLine(startDate, endDate, yCoord) {
-        const endPoint = this.drawArrow(this.constants.TASK_TITLE_START, this.dateToXCoord(endDate) + 4 * this.constants.BASE_WIDTH, yCoord, this.constants.CALENDAR, this.constants.CALENDAR_BG_COLOR)
-
-        const points = []
-        const mondays = []
-        const monthGraduation = []
-        let year
-        const months = []
-        const drawCalendarGraduation = () => {
-
-            const deltaDays = diffInDays(startDate, endDate)
-            console.log(deltaDays, startDate, endDate)
-            const pointYCoord = yCoord - this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.DATE_GRADUATION_Y_COORD
-
-            let m = 0     // monday increment
-            const date_m = new Date(startDate)
-            let j = 0    // months increment
-            const i_0 =  -this.constants.CALENDAR_POINTS_BEFORE_START
-            addDays(date_m, -this.constants.CALENDAR_POINTS_BEFORE_START)
-            for(let i = i_0; i < deltaDays + this.constants.CALENDAR_POINTS_AFTER_END; i++) {
-                const x = this.constants.DATE_GRADUATION_START + i * this.constants.BASE_WIDTH
-
-                // Write year on first graduation
-                if(i === i_0) {
-                    year = new paper.PointText(new paper.Point(
-                        x,
-                        yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_YEAR_FONT_SIZE / 2.5
-                    ))
-
-                    year.fontSize = this.constants.CALENDAR_YEAR_FONT_SIZE
-                    year.fillColor = new paper.Color(0,0,0,0.5)
-                    year.strokeWidth = 1
-                    year.content = date_m.getFullYear()
-                    year.translate(new paper.Point(-(year.bounds.right - year.bounds.left), 0))
-
-                }
-
-                // Show point of not Monday
-                if(date_m.getDay() !== 1) {
-                    points[i] = new paper.Path.Circle(
-                        new paper.Point(x, pointYCoord),
-                        this.constants.CALENDAR_ARROW_POINT_DIAMETER / 2
-                    )
-
-                    points[i].fillColor = 'black'
-                    points[i].opacity = this.constants.TEXT_OPACITY
-                } else {
-                    mondays[m] = new paper.PointText(new paper.Point(x - this.constants.CALENDAR_GRADUATION_FONT_SIZE / 1.5, yCoord))
-                    mondays[m].content = (date_m.getDate() + '').length < 2 ? '0' + date_m.getDate() : date_m.getDate()
-                    mondays[m].fillColor = 'black'
-                    mondays[m].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE
-                    mondays[m].strokeWidth = 1
-                    mondays[m].opacity = this.constants.TEXT_OPACITY
-
-                    m++
-                }
-
-                if(date_m.getDate() === 1 && date_m >= startDate ) {
-                    monthGraduation[j] = new paper.Path.Line(
-                        new paper.Point(x, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 - this.constants.CALENDAR_MONTH_MARK_HEIGHT / 2),
-                        new paper.Point(x, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2 + this.constants.CALENDAR_MONTH_MARK_HEIGHT / 2)
-                    )
-
-                    monthGraduation[j].strokeColor = 'black'
-                    monthGraduation[j].strokeWidth = 3
-                    monthGraduation[j].opacity = this.constants.TEXT_OPACITY
-                    monthGraduation[j].strokeCap = 'round'
-
-                    j++
-                }
-
-                addDays(date_m, 1)
-            }
-        }
-
-        const drawMonths = () => {
-            const monthsNames = [
-                'January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'Septembre', 'October', 'November', 'December',
-            ]
-
-            // Show first month
-            const n = startDate.getMonth() // Start month number
-            for(let i = 0; i < monthGraduation.length + 1; i++) {
-                months[i] = new paper.PointText(year.bounds.right + 1 * this.constants.BASE_WIDTH, yCoord + this.constants.CALENDAR_ARROW_HEIGHT / 2.5 + this.constants.CALENDAR_MONTH_FONT_SIZE / 2)
-                const m = n + i // Current month number
-                months[i].content = monthsNames[m % 12 ? m % 12 : 11]
-                months[i].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE + 2
-
-                if(i === 0) {
-                    if(months[i].bounds.right < monthGraduation[0].bounds.left) {
-                        months[i].fillColor = 'black'
-                        months[i].opacity = 0.5
-                        months[i].strokeWidth = 1
-                    } else {
-                        months[i].opacity = 0
-                    }
-                } else if(i === monthGraduation.length) {
-                    if(this.dateToXCoord(endDate) - (months[i].bounds.right - months[i].bounds.left) / 2 > monthGraduation[i - 1].bounds.right) {
-                        months[i].fillColor = 'black'
-                        months[i].opacity = 0.5
-                        months[i].strokeWidth = 1
-                        const translateX = this.dateToXCoord(endDate) -  months[i].bounds.right
-                        months[i].translate(new paper.Point(translateX, 0))
-                    } else {
-                        months[i].opacity = 0
-                    }
-
-                } else {
-                    // center month
-                    months[i].fillColor = 'black'
-                    months[i].opacity = 0.5
-                    months[i].strokeWidth = 1
-
-                    const midPt = (months[i].bounds.right - months[i].bounds.left) / 2
-                    const midPt_prime = monthGraduation[i - 1].bounds.left + (monthGraduation[i].bounds.left - monthGraduation[i - 1].bounds.right) / 2 - months[0].bounds.left
-                    const delta = midPt_prime - midPt
-                    months[i].translate(new paper.Point(delta, 0))
-                }
-            }
-        }
-
-        const drawLogo = () => {
-            const logo = new paper.Path.Circle(
-                new paper.Point(this.constants.TASK_TITLE_START + this.constants.CALENDAR_ARROW_HEIGHT / 2, yCoord),
-                this.constants.TASK_ARROW_HEIGHT / 2
-            )
-            logo.fillColor = 'black'
-            logo.opacity = this.constants.TEXT_OPACITY
-        }
-
-        drawCalendarGraduation()
-        drawMonths()
-        drawLogo()
-
-        // Calendar arrow defines SVG's furthest coordinates
-        // We use this to infer the SVG framing
-        const svgSize = {
-            x: endPoint.x + this.constants.TASK_TITLE_START,
-            y: year.bounds.bottom + this.constants.TASK_TITLE_START,
-        }
-
-        return svgSize
-    }
-
-    render() {
-        this.drawGanttChart()
-        const { canvasId, svgId } = this.props
-
-        return (
-           <div className="gantt">
-                <h1>Gantt</h1>
-                <canvas id={ canvasId } height={ 500 } width={ 500 } style={{ display: 'none' }}></canvas>
-                <div id={ svgId }></div>
-            </div>
-        )
-    }
+    return (
+      <div className="gantt">
+        <h1>Gantt</h1>
+        <canvas
+          id={canvasId}
+          height={500}
+          width={500}
+          style={{display: "none"}}
+        />
+        <div id={svgId} />
+      </div>
+    );
+  }
 }
 
 Gantt.defaultProps = {
-    getSVG: () => {},   // callback to get svg node generated by paperjs
-    constants: {},
-}
+  getSVG: () => {}, // callback to get svg node generated by paperjs
+  constants: {},
+};
 
-export default Gantt
+export default Gantt;

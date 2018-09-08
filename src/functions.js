@@ -26,8 +26,6 @@ const getDateSpread = tasks => {
     maxDate: new Date(maxDate),
   };
 
-  console.log("reutrn value", returnValue);
-
   return returnValue;
 };
 
@@ -93,7 +91,6 @@ const splitTasks = (tasks, n) => {
     const lowerBound = dateIntervals[i];
     const upperBound = dateIntervals[i + 1];
     result.push([]);
-    console.log("foo", i, n, result);
 
     for (let j = 0; j < tasks.length; j++) {
       const currentTask = tasks[j];
@@ -135,10 +132,6 @@ const splitTasks = (tasks, n) => {
         });
       }
 
-      console.log(
-        "yoooo",
-        trimInterval(startDate, endDate, lowerBound, upperBound),
-      );
       result[i].push({
         ...currentTask,
         startDate: trimInterval(startDate, endDate, lowerBound, upperBound)

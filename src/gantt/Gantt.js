@@ -12,7 +12,6 @@ const addDays = (dat, jump) => {
 
 const diffInDays = (startDate, endDate) => {
   const diff = endDate - startDate; // milliseconds
-  console.log("DIIF", diff, startDate, endDate);
   if (isNaN(startDate.getDay()) || isNaN(endDate.getDate())) debugger;
 
   return diff / (1000 * 60 * 60 * 24);
@@ -267,18 +266,15 @@ class Gantt extends Component {
    * @returns {number} X-coordinate of input date to return
    */
   dateToXCoord(date) {
-    console.log("ERROR HERE", date);
     const xcoord =
       diffInDays(this.constants.START_DATE, date) * this.constants.BASE_WIDTH +
       this.constants.DATE_GRADUATION_START;
-    console.log("ERROR HERE AFTER", xcoord);
     if (!xcoord) return 1000;
 
     return xcoord;
   }
 
   drawArrow(xStart, xEnd, yCoord, taskType, color, isFilled = true) {
-    console.log("HELLO", xStart, xEnd, yCoord, taskType, color, isFilled);
     let ARROW_HEIGHT = 0;
     let tipAnchorLength = 0;
     let opacity = 1;
@@ -364,12 +360,6 @@ class Gantt extends Component {
    * @param {number} yCoord Y-coordinate of arrow midline
    */
   drawTaskArrow(startDate, endDate, yCoord, taskType, color) {
-    console.log("ITS ALSO ME", startDate, endDate);
-    console.log(
-      "ITS ME",
-      this.dateToXCoord(startDate),
-      this.dateToXCoord(endDate),
-    );
     this.drawArrow(
       this.dateToXCoord(startDate),
       this.dateToXCoord(endDate),
@@ -605,7 +595,6 @@ class Gantt extends Component {
     const months = [];
     const drawCalendarGraduation = () => {
       const deltaDays = diffInDays(startDate, endDate);
-      console.log(deltaDays, startDate, endDate);
       const pointYCoord =
         yCoord -
         this.constants.CALENDAR_ARROW_HEIGHT / 2 +

@@ -195,6 +195,9 @@ class Gantt extends Component {
           task.color,
         );
 
+      if (task.after)
+        this.drawTaskTitle(task.title, yCoord, this.constants.TASK, task.color);
+
       if (task.subtasks.length) {
         yCoord +=
           this.constants.TASK_ARROW_HEIGHT / 2 +
@@ -219,6 +222,16 @@ class Gantt extends Component {
               calendarEndDate,
               yCoord,
               task.color,
+            );
+
+          const subtaskColor = new paper.Color(task.color);
+          subtaskColor.alpha = this.constants.SUBTASK_COLOR_OPACITY;
+          if (subtask.after)
+            this.drawTaskTitle(
+              subtask.title,
+              yCoord,
+              this.constants.SUBTASK,
+              subtaskColor,
             );
 
           if (j !== task.subtasks.length - 1)

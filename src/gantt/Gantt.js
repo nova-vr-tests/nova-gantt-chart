@@ -42,16 +42,17 @@ class Gantt extends Component {
     this.updateConstants = this.updateConstants.bind(this);
     this.drawNotStartedTaskLine = this.drawNotStartedTaskLine.bind(this);
     this.drawNotStartedSubtaskLine = this.drawNotStartedSubtaskLine.bind(this);
+
+    this.state = {
+      tasks: this.props.tasks,
+    };
   }
 
   componentDidMount() {
     this.setupCanvas();
   }
-
-  componentWillReceiveProps() {
-    this.setState({tasks: this.props.tasks});
-
-    this.drawGanttChart();
+  componentWillReceiveProps(nextProps) {
+    this.setState({tasks: nextProps.tasks}, this.drawGanttChart);
   }
 
   updateConstants() {
@@ -146,12 +147,14 @@ class Gantt extends Component {
     var canvas = document.getElementById(this.props.canvasId);
     // Create an empty project and a view for the canvas:
     paper.setup(canvas);
+    this.paperId = paper.project.index;
 
     this.drawAllTasks();
   }
 
   drawGanttChart() {
     if (paper.project) {
+      paper.projects[this.paperId].activate();
       paper.project.clear();
 
       this.drawAllTasks();
@@ -161,7 +164,7 @@ class Gantt extends Component {
   drawAllTasks() {
     this.updateConstants();
 
-    const {tasks} = this.props;
+    const {tasks} = this.state;
 
     let yCoord = this.constants.FIRST_TASK_Y;
     // get furthest date in tasks
@@ -263,14 +266,17 @@ class Gantt extends Component {
   }
 
   exportGanttToSVG() {
-    const svg = paper.project.exportSVG();
-    // for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
-    //     document.getElementsByTagName('svg')[0].remove()
-
-    this.svgRange.selectNode(document.getElementById(this.props.svgId));
-    this.svgRange.insertNode(svg);
-
-    return svg;
+    //const svg = paper.project.exportSVG();
+    //// for(let i = 0; i < document.getElementsByTagName('svg').length; i++)
+    ////     document.getElementsByTagName('svg')[0].remove()
+    //const svgWrapper = document.getElementById(this.props.svgId);
+    //const svgs = document.querySelectorAll(
+    //  "#wrapper" + this.props.canvasId + " svg",
+    //);
+    //for (let s of svgs) s.innerHTML = "";
+    //this.svgRange.selectNode(svgWrapper);
+    //this.svgRange.insertNode(svg);
+    //return svg;
   }
 
   /**
@@ -705,14 +711,14 @@ class Gantt extends Component {
     const drawMonths = () => {
       const monthsNames = [
         "January",
-        "Febuary",
+        "February",
         "March",
         "April",
         "May",
         "June",
         "July",
         "August",
-        "Septembre",
+        "September",
         "October",
         "November",
         "December",
@@ -728,7 +734,7 @@ class Gantt extends Component {
             this.constants.CALENDAR_MONTH_FONT_SIZE / 2,
         );
         const m = n + i; // Current month number
-        months[i].content = monthsNames[m % 12 ? m % 12 : 11];
+        months[i].content = monthsNames[m % 12];
         months[i].fontSize = this.constants.CALENDAR_GRADUATION_FONT_SIZE + 2;
 
         if (i === 0) {
@@ -801,18 +807,12 @@ class Gantt extends Component {
   }
 
   render() {
-    this.drawGanttChart();
     const {canvasId, svgId} = this.props;
 
     return (
-      <div className="gantt">
+      <div className="gantt" id={"wrapper" + canvasId}>
         <h1>Gantt</h1>
-        <canvas
-          id={canvasId}
-          height={500}
-          width={500}
-          style={{display: "none"}}
-        />
+        <canvas id={canvasId} height={10000} width={10000} />
         <div id={svgId} />
       </div>
     );

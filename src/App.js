@@ -222,6 +222,7 @@ class App extends Component {
         TASK_TIP_LENGTH: 45,
         SUBTASK_TIP_LENGTH: 35,
         TASK_ARROW_END_DATE_OFFSET: 10,
+        GANTT_SPLITS: 1,
       },
     };
 
@@ -531,6 +532,7 @@ class App extends Component {
       "TASK_TIP_LENGTH",
       "SUBTASK_TIP_LENGTH",
       "TASK_ARROW_END_DATE_OFFSET",
+      "GANTT_SPLITS",
     ].map((e, i) => (
       <ConstantInput
         styles={styles}
@@ -590,7 +592,10 @@ class App extends Component {
     constants.BASE_HEIGHT = this.state.base.y; // task arrow height
     constants.BASE_WIDTH = this.state.base.x; // x-coord difference between 2 days
 
-    const tasks = splitTasks(this.state.tasks, 3);
+    const tasks = splitTasks(
+      this.state.tasks,
+      this.state.constants.GANTT_SPLITS,
+    );
     const Gantts = tasks.map((t, i) => (
       <Gantt
         canvasId={"canvas" + i}
@@ -610,13 +615,6 @@ class App extends Component {
           </div>
         </div>
         <div className="svg--wrapper">
-          <Gantt
-            tasks={this.state.tasks}
-            getSVG={this.getSVG}
-            canvasId="foo"
-            svgId="bar"
-            constants={constants}
-          />
           {Gantts}
           <button
             style={styles.button}

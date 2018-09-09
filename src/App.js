@@ -242,7 +242,6 @@ class App extends Component {
     );
 
     const week = this.weeksToDate;
-    console.log(this.state.tasks);
     const {tasks, initDate} = this.parseTasksSrc(initTasks);
     this.state.tasks = tasks;
     this.state.initDate = initDate;
@@ -592,9 +591,6 @@ class App extends Component {
     constants.BASE_WIDTH = this.state.base.x; // x-coord difference between 2 days
 
     const tasks = splitTasks(this.state.tasks, 3);
-    console.log("=========");
-    console.log(tasks);
-    console.log("=========");
     const Gantts = tasks.map((t, i) => (
       <Gantt
         canvasId={"canvas" + i}
